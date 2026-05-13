@@ -8,9 +8,9 @@ import {
 } from 'lucide-react';
 
 const StockData = () => {
-  const [activeTab, setActiveTab] = useState('manage'); // 'add', 'manage', 'report'
+  const [activeTab, setActiveTab] = useState('add'); // 'add', 'manage', 'report'
   const [search, setSearch] = useState('');
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -22,44 +22,71 @@ const StockData = () => {
   ];
 
   const [stockItems, setStockItems] = useState([
-    { id: 1, party: 'Karuna Trading', meal: 'Standard A', invoice: 'INV-001', bundleNo: '10', perBundleRim: '5', totalRim: '50', sheetsInRim: '100', totalSheet: '5000', grandTotal: 5000, weight: '15.48', sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', gsm: 90, nxr: '1', rate: 5, date: '11/03/2026' },
-    { id: 2, party: 'Global Tech', meal: 'Deon Taps', invoice: 'INV-002', bundleNo: '3.33', perBundleRim: '5', totalRim: '16.65', sheetsInRim: '6', totalSheet: '99.9', grandTotal: 99.9, weight: '7.29', sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', gsm: 90, nxr: '2', rate: 5, date: '12/03/2026' },
+    // AJRAMARJI PACKAGING - Group 1
+    { id: 101, party: 'AJRAMARJI PACKAGING', meal: 'Aaditya PapTech', gsm: 120, sizeCm: '152.40 x 170.18 cm', sizeInch: '60 x 67 inch', grandTotal: '30', totalSheet: '30', date: '11-May-2026', invoice: 'INV-101', nxr: '12', jobDesc: 'Stock Added' },
+    { id: 102, party: 'AJRAMARJI PACKAGING', meal: 'Aaditya PapTech', gsm: 120, sizeCm: '152.40 x 170.18 cm', sizeInch: '60 x 67 inch', grandTotal: '140', totalSheet: '140', date: '11-May-2026', invoice: 'INV-102', nxr: 'No NXR', jobDesc: 'Stock Added' },
+    { id: 103, isJob: true, party: 'AJRAMARJI PACKAGING', meal: 'Aaditya PapTech', gsm: 120, sizeCm: '152.40 x 170.18 cm', sizeInch: '60 x 67 inch', grandTotal: '0', totalSheet: '-20', date: '11-May-2026', invoice: '-', nxr: '12', jobDesc: 'test with Nxr:12 - 10 sheets remaining, Nxr:No NXR has 140 sheets' },
+    { id: 104, isJob: true, party: 'AJRAMARJI PACKAGING', meal: 'Aaditya PapTech', gsm: 120, sizeCm: '152.40 x 170.18 cm', sizeInch: '60 x 67 inch', grandTotal: '0', totalSheet: '-100', date: '11-May-2026', invoice: '-', nxr: 'No NXR', jobDesc: 'test with Nxr:12 - closed, Nxr:No NXR - 50 sheets remaining' },
+    { id: 105, isJob: true, party: 'AJRAMARJI PACKAGING', meal: 'Aaditya PapTech', gsm: 120, sizeCm: '152.40 x 170.18 cm', sizeInch: '60 x 67 inch', grandTotal: '0', totalSheet: '-9', date: '11-May-2026', invoice: '-', nxr: 'No NXR', jobDesc: 'test with Nxr:No NXR - 41 sheets remaining' },
+
+    // Party: 12 - Group 2 & 3
+    { id: 201, party: '12', meal: 'Stock', gsm: '-', sizeCm: '98 x 87 cm', sizeInch: '38.58 x 34.25 inch', grandTotal: '3024', totalSheet: '3024', date: '12-May-2026', invoice: 'INV-201', jobDesc: 'Stock Added' },
+    { id: 202, party: '12', meal: 'Stock', gsm: '-', sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '1728', totalSheet: '1728', date: '12-May-2026', invoice: 'INV-202', jobDesc: 'Stock Added' },
+
+    // Ashit Packaging - Group 4
+    { id: 301, party: 'Ashit Packaging', meal: 'Deon Taps', gsm: 700, sizeCm: '70 x 70 cm', sizeInch: '27.56 x 27.56 inch', grandTotal: '120', totalSheet: '120', date: '21-Mar-2026', invoice: 'INV-301', jobDesc: 'Stock Added' },
+    { id: 302, party: 'Ashit Packaging', meal: 'Deon Taps', gsm: 700, sizeCm: '70 x 70 cm', sizeInch: '27.56 x 27.56 inch', grandTotal: '36', totalSheet: '36', date: '21-Mar-2026', invoice: 'INV-302', jobDesc: 'Stock Added' },
+    { id: 303, isJob: true, party: 'Ashit Packaging', meal: 'Deon Taps', gsm: 700, sizeCm: '70 x 70 cm', sizeInch: '27.56 x 27.56 inch', grandTotal: '0', totalSheet: '-100', date: '21-Mar-2026', invoice: '-', jobDesc: 'job 6 with Nxr:2020 - 20 sheets remaining, Nxr:2021 has 36 sheets' },
+
+    // test party - Group 5 (Deon Taps)
+    { id: 401, party: 'test party', meal: 'Deon Taps', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '180', totalSheet: '180', date: '10-Mar-2026', invoice: 'INV-401', jobDesc: 'Stock Added' },
+    { id: 402, isJob: true, party: 'test party', meal: 'Deon Taps', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '0', totalSheet: '-80', date: '10-Mar-2026', invoice: '-', jobDesc: 'test job1 with Nxr:2 - 100 sheets remaining' },
+
+    // test party - Group 6 (test meal)
+    { id: 501, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '210', totalSheet: '210', date: '10-Mar-2026', invoice: 'INV-501', jobDesc: 'Stock Added' },
+    { id: 502, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '112', totalSheet: '112', date: '10-Mar-2026', invoice: 'INV-502', jobDesc: 'Stock Added' },
+    { id: 503, isJob: true, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '0', totalSheet: '-100', date: '10-Mar-2026', invoice: '-', jobDesc: 'test job 2 with Nxr:1 - 110 sheets remaining, Nxr:3 has 112 sheets' },
+    { id: 504, isJob: true, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '0', totalSheet: '-200', date: '10-Mar-2026', invoice: '-', jobDesc: 'test job 2 with Nxr:1 - closed, Nxr:3 - 22 sheets remaining' },
+    { id: 505, isJob: true, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '0', totalSheet: '-22', date: '10-Mar-2026', invoice: '-', jobDesc: 'test job 4 with Nxr:3 - closed' },
   ]);
 
   const [stockForm, setStockForm] = useState({
     party: '',
     meal: '',
     invoice: '',
-    gsm: '',
-    size: '',
-    sizeUnit: 'cm',
     nxr: '',
     rate: '',
     date: new Date().toLocaleDateString('en-GB').split('/').join('-')
   });
 
-  const [stockSpecs, setStockSpecs] = useState([{ 
+  const [stockSpecs, setStockSpecs] = useState([{
     id: Date.now(),
     bundleNo: '',
     perBundleRim: '',
-    totalRim: '0',
+    totalRim: '',
     sheetsInRim: '',
-    totalSheet: '0',
-    weight: '0.00',
-    convSize: '-',
+    totalSheet: '',
+    gsm: '',
+    size: '',
+    sizeUnit: 'cm',
+    weight: '',
+    convSize: '',
     mode: 'calc' // 'calc' or 'manual'
   }]);
 
   const addSpecRow = () => {
-    setStockSpecs([...stockSpecs, { 
+    setStockSpecs([...stockSpecs, {
       id: Date.now(),
       bundleNo: '',
       perBundleRim: '',
-      totalRim: '0',
+      totalRim: '',
       sheetsInRim: '',
-      totalSheet: '0',
-      weight: '0.00',
-      convSize: '-',
+      totalSheet: '',
+      gsm: '',
+      size: '',
+      sizeUnit: 'cm',
+      weight: '',
+      convSize: '',
       mode: 'calc'
     }]);
   };
@@ -126,13 +153,12 @@ const StockData = () => {
 
   useEffect(() => {
     const updatedSpecs = stockSpecs.map(spec => {
-      const calcs = calculateValues(spec, stockForm.gsm, stockForm.size, stockForm.sizeUnit);
-      // Preserve manual totalSheet if in manual mode, unless we want it to update weight
+      const calcs = calculateValues(spec, spec.gsm, spec.size, spec.sizeUnit);
       return { ...spec, ...calcs };
     });
-    
-    const hasChanged = updatedSpecs.some((spec, i) => 
-      spec.totalRim !== stockSpecs[i]?.totalRim || 
+
+    const hasChanged = updatedSpecs.some((spec, i) =>
+      spec.totalRim !== stockSpecs[i]?.totalRim ||
       spec.totalSheet !== stockSpecs[i]?.totalSheet ||
       spec.weight !== stockSpecs[i]?.weight ||
       spec.convSize !== stockSpecs[i]?.convSize
@@ -141,11 +167,11 @@ const StockData = () => {
     if (hasChanged) {
       setStockSpecs(updatedSpecs);
     }
-  }, [stockForm.gsm, stockForm.size, stockForm.sizeUnit, stockSpecs.map(s => `${s.bundleNo}-${s.perBundleRim}-${s.sheetsInRim}-${s.totalSheet}-${s.mode}`).join(',')]);
+  }, [stockSpecs.map(s => `${s.bundleNo}-${s.perBundleRim}-${s.sheetsInRim}-${s.totalSheet}-${s.mode}-${s.gsm}-${s.size}-${s.sizeUnit}`).join(',')]);
 
   const handleAddStock = (e) => {
     e.preventDefault();
-    
+
     const itemsToAdd = stockSpecs.map(spec => ({
       id: stockForm.id && stockSpecs.length === 1 ? stockForm.id : Date.now() + Math.random(),
       ...stockForm,
@@ -156,8 +182,9 @@ const StockData = () => {
       totalSheet: spec.totalSheet,
       grandTotal: spec.totalSheet,
       weight: spec.weight,
-      sizeCm: stockForm.sizeUnit === 'cm' ? stockForm.size + ' cm' : spec.convSize,
-      sizeInch: stockForm.sizeUnit === 'inch' ? stockForm.size + ' inch' : spec.convSize,
+      gsm: spec.gsm,
+      sizeCm: spec.sizeUnit === 'cm' ? spec.size + ' cm' : spec.convSize,
+      sizeInch: spec.sizeUnit === 'inch' ? spec.size + ' inch' : spec.convSize,
     }));
 
     if (stockForm.id && stockSpecs.length === 1) {
@@ -166,8 +193,8 @@ const StockData = () => {
       setStockItems([...itemsToAdd, ...stockItems]);
     }
 
-    setStockForm({ party: '', meal: '', invoice: '', gsm: '', size: '', sizeUnit: 'cm', nxr: '', rate: '', date: new Date().toLocaleDateString('en-GB').split('/').join('-') });
-    setStockSpecs([{ id: Date.now(), bundleNo: '', perBundleRim: '', totalRim: '0', sheetsInRim: '', totalSheet: '0', weight: '0.00', convSize: '-', mode: 'calc' }]);
+    setStockForm({ party: '', meal: '', invoice: '', nxr: '', rate: '', date: new Date().toLocaleDateString('en-GB').split('/').join('-') });
+    setStockSpecs([{ id: Date.now(), bundleNo: '', perBundleRim: '', totalRim: '', sheetsInRim: '', totalSheet: '', gsm: '', size: '', sizeUnit: 'cm', weight: '', convSize: '', mode: 'calc' }]);
     setActiveTab('manage');
   };
 
@@ -190,45 +217,51 @@ const StockData = () => {
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
               <User size={14} style={{ color: 'var(--primary)' }} /> Party Name *
             </label>
-            <select 
-              required 
+            <select
+              required
               value={stockForm.party}
-              onChange={(e) => setStockForm({...stockForm, party: e.target.value})}
+              onChange={(e) => setStockForm({ ...stockForm, party: e.target.value })}
               style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
             >
               <option value="">Select Party</option>
-              <option>Karuna Trading</option>
-              <option>Global Tech</option>
+              <option>test party</option>
+              <option>Ashit Packaging</option>
               <option>AJRAMARJI PACKAGING</option>
+              <option>BoxPrintz Packaging Solutions</option>
+              <option>Mukul Jamsans</option>
+              <option>VINOD MEDICAL SYSTEMS Pvt,Ltd</option>
+              <option>Pareen Pac.</option>
             </select>
           </div>
           <div style={{ width: '250px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
               <Coffee size={14} style={{ color: 'var(--primary)' }} /> Meal Name *
             </label>
-            <select 
-              required 
+            <select
+              required
               value={stockForm.meal}
-              onChange={(e) => setStockForm({...stockForm, meal: e.target.value})}
+              onChange={(e) => setStockForm({ ...stockForm, meal: e.target.value })}
               style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
             >
               <option value="">Select Meal</option>
-              <option>Standard A</option>
-              <option>Executive B</option>
+              <option>test meal</option>
+              <option>Deon Taps</option>
               <option>Aaditya PapTech</option>
+              <option>H C Shah & Sons</option>
+              <option>Kherani Paper</option>
             </select>
           </div>
           <div style={{ width: '220px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
               <FileText size={14} style={{ color: 'var(--primary)' }} /> Invoice No *
             </label>
-            <input 
-              type="text" 
-              placeholder="Enter invoice number" 
-              required 
+            <input
+              type="text"
+              placeholder="Enter invoice number"
+              required
               value={stockForm.invoice}
-              onChange={(e) => setStockForm({...stockForm, invoice: e.target.value})}
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+              onChange={(e) => setStockForm({ ...stockForm, invoice: e.target.value })}
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
             />
           </div>
         </div>
@@ -244,10 +277,10 @@ const StockData = () => {
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
                 <Layers size={14} style={{ color: 'var(--primary)' }} /> Bundle No
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 step="any"
-                placeholder="0" 
+                placeholder="0"
                 value={spec.bundleNo}
                 disabled={spec.mode === 'manual'}
                 onChange={(e) => {
@@ -255,17 +288,17 @@ const StockData = () => {
                   newSpecs[index].bundleNo = e.target.value;
                   setStockSpecs(newSpecs);
                 }}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: spec.mode === 'manual' ? '#f5f5f5' : '#fff', fontSize: '0.85rem' }} 
+                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: spec.mode === 'manual' ? '#f5f5f5' : '#fff', fontSize: '0.85rem' }}
               />
             </div>
             <div style={{ width: '130px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
                 <Layers size={14} style={{ color: 'var(--primary)' }} /> Per Bundle Rim
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 step="any"
-                placeholder="0" 
+                placeholder="0"
                 value={spec.perBundleRim}
                 disabled={spec.mode === 'manual'}
                 onChange={(e) => {
@@ -273,27 +306,27 @@ const StockData = () => {
                   newSpecs[index].perBundleRim = e.target.value;
                   setStockSpecs(newSpecs);
                 }}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: spec.mode === 'manual' ? '#f5f5f5' : '#fff', fontSize: '0.85rem' }} 
+                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: spec.mode === 'manual' ? '#f5f5f5' : '#fff', fontSize: '0.85rem' }}
               />
             </div>
             <div style={{ width: '100px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
                 <FileText size={14} style={{ color: 'var(--primary)' }} /> Total Rim
               </label>
-              <input 
-                type="text" 
-                value={spec.totalRim} 
+              <input
+                type="text"
+                value={spec.totalRim}
                 readOnly
-                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem' }} 
+                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem' }}
               />
             </div>
             <div style={{ width: '110px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
                 <Maximize size={14} style={{ color: 'var(--primary)' }} /> Sheets in Rim
               </label>
-              <input 
-                type="number" 
-                placeholder="0" 
+              <input
+                type="number"
+                placeholder="0"
                 value={spec.sheetsInRim}
                 disabled={spec.mode === 'manual'}
                 onChange={(e) => {
@@ -301,7 +334,7 @@ const StockData = () => {
                   newSpecs[index].sheetsInRim = e.target.value;
                   setStockSpecs(newSpecs);
                 }}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: spec.mode === 'manual' ? '#f5f5f5' : '#fff', fontSize: '0.85rem' }} 
+                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: spec.mode === 'manual' ? '#f5f5f5' : '#fff', fontSize: '0.85rem' }}
               />
             </div>
             <div style={{ width: '180px' }}>
@@ -309,11 +342,11 @@ const StockData = () => {
                 <Calculator size={14} style={{ color: 'var(--primary)' }} /> Total Sheet *
               </label>
               <div style={{ display: 'flex', gap: '0px', position: 'relative' }}>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   step="any"
-                  value={spec.totalSheet} 
-                  required 
+                  value={spec.totalSheet}
+                  required
                   readOnly={spec.mode === 'calc'}
                   onChange={(e) => {
                     if (spec.mode === 'manual') {
@@ -322,9 +355,9 @@ const StockData = () => {
                       setStockSpecs(newSpecs);
                     }
                   }}
-                  style={{ flex: 1, minWidth: 0, padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', border: '1px solid var(--border-color)', borderRight: 'none', background: spec.mode === 'calc' ? 'var(--bg-color)' : '#fff', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem' }} 
+                  style={{ flex: 1, minWidth: 0, padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', border: '1px solid var(--border-color)', borderRight: 'none', background: spec.mode === 'calc' ? 'var(--bg-color)' : '#fff', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem' }}
                 />
-                <select 
+                <select
                   value={spec.mode}
                   onChange={(e) => {
                     const newSpecs = [...stockSpecs];
@@ -342,13 +375,17 @@ const StockData = () => {
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
                 <Layers size={14} style={{ color: 'var(--primary)' }} /> GSM *
               </label>
-              <input 
-                type="number" 
-                placeholder="e.g. 80" 
-                required 
-                value={stockForm.gsm}
-                onChange={(e) => setStockForm({...stockForm, gsm: e.target.value})}
-                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem' }} 
+              <input
+                type="number"
+                placeholder="e.g. 80"
+                required
+                value={spec.gsm}
+                onChange={(e) => {
+                  const newSpecs = [...stockSpecs];
+                  newSpecs[index].gsm = e.target.value;
+                  setStockSpecs(newSpecs);
+                }}
+                style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem' }}
               />
             </div>
             <div style={{ width: '180px' }}>
@@ -356,17 +393,25 @@ const StockData = () => {
                 <Maximize size={14} style={{ color: 'var(--primary)' }} /> Paper/Reel Size *
               </label>
               <div style={{ display: 'flex', gap: '0px' }}>
-                <input 
-                  type="text" 
-                  placeholder="e.g., 60*67" 
-                  required 
-                  value={stockForm.size}
-                  onChange={(e) => setStockForm({...stockForm, size: e.target.value})}
-                  style={{ flex: 1, minWidth: 0, padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', border: '1px solid var(--border-color)', borderRight: 'none', background: '#fff', fontSize: '0.85rem' }} 
+                <input
+                  type="text"
+                  placeholder="e.g., 60*67"
+                  required
+                  value={spec.size}
+                  onChange={(e) => {
+                    const newSpecs = [...stockSpecs];
+                    newSpecs[index].size = e.target.value;
+                    setStockSpecs(newSpecs);
+                  }}
+                  style={{ flex: 1, minWidth: 0, padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', border: '1px solid var(--border-color)', borderRight: 'none', background: '#fff', fontSize: '0.85rem' }}
                 />
-                <select 
-                  value={stockForm.sizeUnit}
-                  onChange={(e) => setStockForm({...stockForm, sizeUnit: e.target.value})}
+                <select
+                  value={spec.sizeUnit}
+                  onChange={(e) => {
+                    const newSpecs = [...stockSpecs];
+                    newSpecs[index].sizeUnit = e.target.value;
+                    setStockSpecs(newSpecs);
+                  }}
                   style={{ width: '60px', padding: '0.5rem 0.3rem', borderRadius: '0 var(--radius-md) var(--radius-md) 0', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.75rem', cursor: 'pointer', outline: 'none' }}
                 >
                   <option value="cm">cm</option>
@@ -394,7 +439,7 @@ const StockData = () => {
               >
                 <Plus size={18} />
               </button>
-              {stockSpecs.length > 1 && (
+              {index > 0 && (
                 <button
                   type="button"
                   onClick={() => removeSpecRow(spec.id)}
@@ -413,45 +458,45 @@ const StockData = () => {
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
               <Hash size={14} style={{ color: 'var(--primary)' }} /> NXR No
             </label>
-            <input 
-              type="text" 
-              placeholder="Enter NXR" 
+            <input
+              type="text"
+              placeholder="Enter NXR"
               value={stockForm.nxr}
-              onChange={(e) => setStockForm({...stockForm, nxr: e.target.value})}
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+              onChange={(e) => setStockForm({ ...stockForm, nxr: e.target.value })}
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
             />
           </div>
           <div style={{ width: '150px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
               <TrendingUp size={14} style={{ color: 'var(--primary)' }} /> Rate
             </label>
-            <input 
-              type="number" 
+            <input
+              type="number"
               step="any"
-              placeholder="0.00" 
+              placeholder="0.00"
               value={stockForm.rate}
-              onChange={(e) => setStockForm({...stockForm, rate: e.target.value})}
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+              onChange={(e) => setStockForm({ ...stockForm, rate: e.target.value })}
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
             />
           </div>
           <div style={{ width: '220px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
               <Calendar size={14} style={{ color: 'var(--primary)' }} /> Chalan Date
             </label>
-            <input 
-              type="text" 
-              placeholder="dd-mm-yyyy" 
+            <input
+              type="text"
+              placeholder="dd-mm-yyyy"
               value={stockForm.date}
-              onChange={(e) => setStockForm({...stockForm, date: e.target.value})}
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+              onChange={(e) => setStockForm({ ...stockForm, date: e.target.value })}
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
             />
           </div>
         </div>
       </div>
-      
+
       <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
         <button type="button" onClick={() => setActiveTab('manage')} style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
-        <button type="button" onClick={() => { setStockForm({ party: '', meal: '', invoice: '', gsm: '', size: '', sizeUnit: 'cm', nxr: '', rate: '', date: new Date().toLocaleDateString('en-GB').split('/').join('-') }); setStockSpecs([{ id: Date.now(), bundleNo: '', perBundleRim: '', totalRim: '0', sheetsInRim: '', totalSheet: '0', weight: '0.00', convSize: '-', mode: 'calc' }]); }} style={{
+        <button type="button" onClick={() => { setStockForm({ party: '', meal: '', invoice: '', nxr: '', rate: '', date: new Date().toLocaleDateString('en-GB').split('/').join('-') }); setStockSpecs([{ id: Date.now(), bundleNo: '', perBundleRim: '', totalRim: '', sheetsInRim: '', totalSheet: '', gsm: '', size: '', sizeUnit: 'cm', weight: '', convSize: '', mode: 'calc' }]); }} style={{
           padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)',
           background: 'var(--bg-color)', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: '0.4rem'
@@ -520,7 +565,7 @@ const StockData = () => {
             </tr>
           </thead>
           <tbody>
-            {stockItems.filter(s => s.party.toLowerCase().includes(search.toLowerCase()) || s.meal.toLowerCase().includes(search.toLowerCase())).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map(s => (
+            {stockItems.filter(s => !s.isJob && (s.party.toLowerCase().includes(search.toLowerCase()) || s.meal.toLowerCase().includes(search.toLowerCase()))).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map(s => (
               <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
                 <td style={{ padding: '0.45rem 0.75rem', fontWeight: 500, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.party}</td>
                 <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.meal}</td>
@@ -540,7 +585,24 @@ const StockData = () => {
                 <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.date}</td>
                 <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
                   <div style={{ display: 'flex', gap: '0.4rem' }}>
-                    <button className="btn-action-edit" onClick={() => { setActiveTab('add'); setStockForm(s); setStockSpecs([{...s, id: Date.now(), convSize: s.sizeInch.includes('cm') ? s.sizeInch : s.sizeCm, mode: 'manual'}]); }}>
+                    <button className="btn-action-edit" onClick={() => {
+                      setActiveTab('add');
+                      const unit = s.sizeCm.toLowerCase().includes('cm') ? 'cm' : 'inch';
+                      setStockForm({
+                        ...s,
+                        nxr: s.nxr,
+                        rate: s.rate
+                      });
+                      setStockSpecs([{
+                        ...s,
+                        id: Date.now(),
+                        gsm: s.gsm,
+                        size: unit === 'cm' ? s.sizeCm.replace(' cm', '') : s.sizeInch.replace(' inch', ''),
+                        sizeUnit: unit,
+                        convSize: unit === 'cm' ? s.sizeInch : s.sizeCm,
+                        mode: 'manual'
+                      }]);
+                    }}>
                       <Edit size={14} /> Edit
                     </button>
                     <button className="btn-action-delete" onClick={() => handleDeleteStock(s.id)}>
@@ -559,11 +621,11 @@ const StockData = () => {
         <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
           Showing {Math.min((currentPage - 1) * rowsPerPage + 1, stockItems.length)} to {Math.min(currentPage * rowsPerPage, stockItems.length)} of {stockItems.length} entries
         </div>
-        
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             Rows per page:
-            <select 
+            <select
               value={rowsPerPage}
               onChange={(e) => {
                 setRowsPerPage(Number(e.target.value));
@@ -578,31 +640,31 @@ const StockData = () => {
           </div>
 
           <div style={{ display: 'flex', gap: '0.25rem' }}>
-            <button 
+            <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: currentPage === 1 ? '#ccc' : 'var(--text-muted)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <ChevronLeft size={16} />
             </button>
-            
+
             {[...Array(Math.max(1, Math.ceil(stockItems.length / rowsPerPage)))].map((_, i) => (
-              <button 
+              <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                style={{ 
-                  width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', 
-                  border: currentPage === i + 1 ? 'none' : '1px solid var(--border-color)', 
-                  background: currentPage === i + 1 ? 'var(--primary)' : '#fff', 
-                  color: currentPage === i + 1 ? '#fff' : 'var(--text-muted)', 
-                  fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' 
+                style={{
+                  width: '32px', height: '32px', borderRadius: 'var(--radius-sm)',
+                  border: currentPage === i + 1 ? 'none' : '1px solid var(--border-color)',
+                  background: currentPage === i + 1 ? 'var(--primary)' : '#fff',
+                  color: currentPage === i + 1 ? '#fff' : 'var(--text-muted)',
+                  fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'
                 }}
               >
                 {i + 1}
               </button>
             ))}
 
-            <button 
+            <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(stockItems.length / rowsPerPage)))}
               disabled={currentPage === Math.ceil(stockItems.length / rowsPerPage) || stockItems.length === 0}
               style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: (currentPage === Math.ceil(stockItems.length / rowsPerPage) || stockItems.length === 0) ? '#ccc' : 'var(--text-muted)', cursor: (currentPage === Math.ceil(stockItems.length / rowsPerPage) || stockItems.length === 0) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -616,18 +678,41 @@ const StockData = () => {
   );
 
   const renderStockReport = () => {
-    // Generate dynamic report data based on stockItems
-    const reportData = stockItems.map(item => ({
-      party: item.party,
-      meal: item.meal,
-      gsm: item.gsm,
-      size: item.sizeCm,
-      flows: [
-        { prev: '0', used: '', added: item.totalSheet, avail: item.totalSheet, date: item.date, jobs: 'Stock Initial Addition' },
-        { prev: item.totalSheet, used: '100', added: '', avail: (parseFloat(item.totalSheet) - 100).toString(), date: '11-May-2026', jobs: 'Job ID: 482 Consumption' }
-      ],
-      totals: { used: 100, added: item.totalSheet, avail: (parseFloat(item.totalSheet) - 100).toString() }
-    }));
+    // Dynamically calculate report data based on stockItems
+    const groupedData = {};
+
+    stockItems.forEach(item => {
+      const key = `${item.party}|${item.meal}|${item.gsm}|${item.sizeCm}`;
+      if (!groupedData[key]) {
+        groupedData[key] = {
+          party: item.party,
+          meal: item.meal,
+          gsm: item.gsm,
+          size: item.sizeCm,
+          flows: [],
+          totals: { used: 0, added: 0, avail: 0 }
+        };
+      }
+
+      const added = parseFloat(item.grandTotal) || 0;
+      const avail = parseFloat(item.totalSheet) || 0;
+      const used = added - avail;
+
+      groupedData[key].flows.push({
+        prev: (groupedData[key].totals.avail).toString(),
+        used: used > 0 ? used.toString() : '',
+        added: added.toString(),
+        avail: (groupedData[key].totals.avail + added - used).toString(),
+        date: item.date || 'N/A',
+        jobs: item.jobDesc || (used > 0 ? `Used ${used} sheets` : 'Stock Added')
+      });
+
+      groupedData[key].totals.added += added;
+      groupedData[key].totals.avail += avail;
+      groupedData[key].totals.used += used;
+    });
+
+    const reportData = Object.values(groupedData);
 
     return (
       <div style={{ animation: 'fadeIn .4s ease' }}>
@@ -635,6 +720,7 @@ const StockData = () => {
           background: 'var(--surface)', border: '1px solid var(--border-color)',
           borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
         }}>
+
           {/* Header & Filter Bar */}
           <div style={{
             padding: '0.5rem 1.5rem', borderBottom: '1px solid var(--border-color)',
@@ -643,11 +729,11 @@ const StockData = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <BarChart3 size={20} style={{ color: 'var(--primary)' }} />
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Stock Report</h2>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Material Breakdown</h2>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <button onClick={() => window.print()} style={{ padding: '0.55rem 1.5rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileText size={16} /> Generate PDF Report
+                <FileText size={16} /> Export Report
               </button>
             </div>
           </div>
@@ -658,7 +744,7 @@ const StockData = () => {
               <thead>
                 <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
                   {[
-                    'Party Name', 'Meal Name', 'GSM', 'Size (cm)', 'Previous Stock (Sheets)', 
+                    'Party Name', 'Meal Name', 'GSM', 'Size (cm)', 'Previous Stock (Sheets)',
                     'Used Stock (Sheets)', 'Added Stock', 'Available Stock', 'Date', 'Jobs'
                   ].map(h => (
                     <th key={h} style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', borderRight: '1px solid rgba(0,0,0,0.05)', whiteSpace: 'nowrap' }}>{h}</th>
@@ -666,7 +752,11 @@ const StockData = () => {
                 </tr>
               </thead>
               <tbody>
-                {reportData.map((group, gIdx) => (
+                {reportData.length === 0 ? (
+                  <tr>
+                    <td colSpan="10" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No stock data available for report.</td>
+                  </tr>
+                ) : reportData.map((group, gIdx) => (
                   <React.Fragment key={gIdx}>
                     {group.flows.map((flow, fIdx) => (
                       <tr key={fIdx} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
@@ -688,12 +778,14 @@ const StockData = () => {
                     ))}
                     {/* Subtotal Row */}
                     <tr style={{ background: 'rgba(79, 70, 229, 0.03)', borderBottom: '2px solid var(--border-color)' }}>
-                      <td style={{ padding: '0.4rem 0.75rem', fontWeight: 800, borderRight: '1px solid rgba(0,0,0,0.05)' }}>Total</td>
-                      <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)' }}></td>
-                      <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)', textAlign: 'right', fontWeight: 800 }}>{group.totals.used}</td>
+                      {/* Columns 1 & 2 are occupied by rowSpan from the first row of the group */}
+                      <td style={{ padding: '0.4rem 0.75rem', fontWeight: 800, borderRight: '1px solid rgba(0,0,0,0.05)' }}>Total</td> {/* GSM Column */}
+                      <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)' }}></td> {/* Size Column */}
+                      <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)' }}></td> {/* Previous Stock Column */}
+                      <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)', textAlign: 'right', fontWeight: 800 }}>{group.totals.used || ''}</td>
                       <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)', textAlign: 'right', fontWeight: 800, color: '#10B981' }}>{group.totals.added}</td>
                       <td style={{ padding: '0.4rem 0.75rem', borderRight: '1px solid rgba(0,0,0,0.05)', textAlign: 'right', fontWeight: 800, color: 'var(--primary)' }}>{group.totals.avail}</td>
-                      <td colSpan={2} style={{ borderRight: '1px solid rgba(0,0,0,0.05)' }}></td>
+                      <td colSpan={2} style={{ borderRight: '1px solid rgba(0,0,0,0.05)' }}></td> {/* Date & Jobs Columns */}
                     </tr>
                   </React.Fragment>
                 ))}
@@ -712,7 +804,7 @@ const StockData = () => {
           <div style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
             <span style={{ cursor: 'pointer', transition: 'color 0.2s' }}>Stock Management</span>
             <span>/</span>
-            <span style={{ color: 'var(--text-main)' }}>{tabs.find(t => t.id === activeTab)?.label || 'Manage'}</span>
+            <span style={{ color: 'var(--text-main)' }}>{tabs.find(t => t.id === activeTab)?.label || 'add'}</span>
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Stock Management</h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.2rem', fontSize: '0.9rem' }}>

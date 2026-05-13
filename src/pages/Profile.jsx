@@ -7,6 +7,7 @@ import {
 const Profile = () => {
   const [saved, setSaved] = useState(false);
   const fileInputRef = useRef(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [profileData, setProfileData] = useState({
     name: 'Shreeji Print Pack',
     email: 'info70@unrietrading.com',
@@ -97,18 +98,41 @@ const Profile = () => {
                 onClick={() => fileInputRef.current.click()}
                 style={{
                   border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-md)',
-                  padding: '1.5rem', textAlign: 'center', cursor: 'pointer',
-                  background: 'var(--bg-color)', transition: 'all .2s'
+                  padding: logoPreview ? '0.5rem' : '1.5rem', textAlign: 'center', cursor: 'pointer',
+                  background: 'var(--bg-color)', transition: 'all .2s',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  minHeight: '120px'
                 }}
                 onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'}
                 onMouseOut={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
               >
-                <Camera size={24} style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }} />
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Click to choose logo</div>
-                <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
+                {logoPreview ? (
+                  <img src={logoPreview} alt="Logo Preview" style={{ maxWidth: '100%', maxHeight: '100px', borderRadius: 'var(--radius-sm)' }} />
+                ) : (
+                  <>
+                    <Camera size={24} style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }} />
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Click to choose logo</div>
+                  </>
+                )}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  style={{ display: 'none' }} 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setLogoPreview(reader.result);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
               </div>
-              <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <CheckCircle2 size={14} /> Existing logo uploaded
+              <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: logoPreview ? '#10B981' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <CheckCircle2 size={14} /> {logoPreview ? 'Logo selected' : 'No logo uploaded'}
               </div>
             </div>
           </div>

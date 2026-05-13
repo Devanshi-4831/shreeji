@@ -33,9 +33,23 @@ const PartyMealManagement = () => {
     { id: 3, name: 'Kherani Paper' },
   ]);
 
-  // Form States
+  // Company Info State
+  const [companyInfo, setCompanyInfo] = useState({
+    name: 'Shreeji Print Pack',
+    email: 'info70@unrietrading.com',
+    phone: '6754345678',
+    gst: '24ABCDE1234F1Z5',
+    address: '21, Silver Plaza, Station Road, Bhavnagar – 364001, Gujarat, India.',
+    logo: null
+  });
+
   const [partyForm, setPartyForm] = useState({ name: '', email: '', phone: '' });
   const [mealForm, setMealForm] = useState({ name: '' });
+
+  const handleSaveCompany = (e) => {
+    e.preventDefault();
+    alert('Company details saved successfully!');
+  };
 
   const handleAddParty = (e) => {
     e.preventDefault();
@@ -327,7 +341,7 @@ const PartyMealManagement = () => {
   };
 
   const renderCompanyDetails = () => (
-    <div style={{
+    <form onSubmit={handleSaveCompany} style={{
       background: 'var(--surface)', border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius-lg)', padding: '1.25rem', boxShadow: 'var(--shadow-sm)', width: '100%'
     }}>
@@ -336,19 +350,44 @@ const PartyMealManagement = () => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'flex-end' }}>
           <div style={{ flex: '1 1 300px', maxWidth: '400px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Company Name *</label>
-            <input type="text" defaultValue="Shreeji Print Pack" required style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} />
+            <input 
+              type="text" 
+              value={companyInfo.name} 
+              onChange={(e) => setCompanyInfo({...companyInfo, name: e.target.value})}
+              required 
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            />
           </div>
           <div style={{ flex: '1 1 250px', maxWidth: '350px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Email *</label>
-            <input type="email" defaultValue="info70@unrietrading.com" required style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} />
+            <input 
+              type="email" 
+              value={companyInfo.email} 
+              onChange={(e) => setCompanyInfo({...companyInfo, email: e.target.value})}
+              required 
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            />
           </div>
           <div style={{ width: '180px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Mobile No. *</label>
-            <input type="text" defaultValue="6754345678" required maxLength={10} style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} />
+            <input 
+              type="text" 
+              value={companyInfo.phone} 
+              onChange={(e) => setCompanyInfo({...companyInfo, phone: e.target.value})}
+              required 
+              maxLength={10} 
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            />
           </div>
           <div style={{ width: '220px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>GST No. *</label>
-            <input type="text" defaultValue="24ABCDE1234F1Z5" required style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} />
+            <input 
+              type="text" 
+              value={companyInfo.gst} 
+              onChange={(e) => setCompanyInfo({...companyInfo, gst: e.target.value})}
+              required 
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            />
           </div>
         </div>
 
@@ -356,29 +395,42 @@ const PartyMealManagement = () => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'flex-start' }}>
           <div style={{ flex: '1 1 500px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Address *</label>
-            <textarea defaultValue="21, Silver Plaza, Station Road, Bhavnagar – 364001, Gujarat, India." required rows={3} style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem', resize: 'none' }} />
+            <textarea 
+              value={companyInfo.address} 
+              onChange={(e) => setCompanyInfo({...companyInfo, address: e.target.value})}
+              required 
+              rows={3} 
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem', resize: 'none' }} 
+            />
           </div>
           <div style={{ width: '350px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Upload Logo *</label>
             <div onClick={() => fileInputRef.current.click()} style={{ border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-md)', padding: '0.75rem', textAlign: 'center', cursor: 'pointer', background: 'var(--bg-color)' }}>
               <Camera size={20} style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }} />
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Click to choose logo</div>
-              <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{companyInfo.logo ? companyInfo.logo.name : 'Click to choose logo'}</div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={(e) => setCompanyInfo({...companyInfo, logo: e.target.files[0]})}
+                style={{ display: 'none' }} 
+              />
             </div>
             <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-              <CheckCircle2 size={12} /> Existing logo uploaded
+              <CheckCircle2 size={12} /> {companyInfo.logo ? 'Logo chosen' : 'Existing logo uploaded'}
             </div>
           </div>
         </div>
       </div>
       <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-        <button style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
-        <button style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <button type="button" onClick={() => setActiveTab('manage-parties')} style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
+        <button type="button" onClick={() => setCompanyInfo({ name: '', email: '', phone: '', gst: '', address: '', logo: null })} style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <RefreshCcw size={16} /> Reset
         </button>
-        <button style={{ padding: '0.6rem 2rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: '#fff', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer' }}>Save Details</button>
+        <button type="submit" style={{ padding: '0.6rem 2rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: '#fff', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Save size={18} /> Save Details
+        </button>
       </div>
-    </div>
+    </form>
   );
 
   const tabs = [

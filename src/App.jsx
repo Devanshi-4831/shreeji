@@ -16,8 +16,8 @@ function App() {
       
       {/* Protected Routes inside AppLayout */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Navigate to="/PartyMealManagement" replace />} />
-           <Route path="/party-meal" element={<PartyMealManagement />} />
+        <Route path="/" element={<Navigate to="/party-meal" replace />} />
+        <Route path="/party-meal" element={<PartyMealManagement />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/stock" element={<StockData />} />
         <Route path="/job" element={<JobManagement />} />
