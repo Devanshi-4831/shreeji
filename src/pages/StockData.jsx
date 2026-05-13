@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   Package, Plus, Search, Filter, FileText, Mail,
   Printer, Download, Edit, Trash2, ChevronLeft,
@@ -8,7 +11,16 @@ import {
 } from 'lucide-react';
 
 const StockData = () => {
-  const [activeTab, setActiveTab] = useState('add'); // 'add', 'manage', 'report'
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'add'); // 'add', 'manage', 'report'
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const [search, setSearch] = useState('');
 
   // Pagination State
@@ -196,6 +208,59 @@ const StockData = () => {
     setStockForm({ party: '', meal: '', invoice: '', nxr: '', rate: '', date: new Date().toLocaleDateString('en-GB').split('/').join('-') });
     setStockSpecs([{ id: Date.now(), bundleNo: '', perBundleRim: '', totalRim: '', sheetsInRim: '', totalSheet: '', gsm: '', size: '', sizeUnit: 'cm', weight: '', convSize: '', mode: 'calc' }]);
     setActiveTab('manage');
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF('landscape');
+    doc.text('Shreeji ERP - Stock Inventory', 14, 15);
+    
+    const tableData = stockItems
+      .filter(s => !s.isJob && (s.party.toLowerCase().includes(search.toLowerCase()) || s.meal.toLowerCase().includes(search.toLowerCase())))
+      .map(s => [
+        s.party, s.meal, s.invoice, s.bundleNo, s.perBundleRim, s.totalRim,
+        s.sheetsInRim, s.totalSheet, s.grandTotal, s.weight,
+        s.sizeCm, s.sizeInch, s.gsm, s.nxr, s.rate, s.date
+      ]);
+
+    autoTable(doc, {
+      head: [['Party', 'Meal', 'Invoice', 'Bundle No', 'Per Bundle Rim', 'Total Rim', 'Sheets in Rim', 'Total Sheet', 'Grand Total', 'Weight', 'Size (cm)', 'Size (inch)', 'GSM', 'NXR No', 'Rate', 'Date']],
+      body: tableData,
+      startY: 20,
+      styles: { fontSize: 8 },
+      headStyles: { fillStyle: 'var(--primary)' }
+    });
+    
+    doc.save('stock_inventory.pdf');
+  };
+
+  const exportReportToPDF = (reportData) => {
+    const doc = new jsPDF('landscape');
+    doc.text('Shreeji ERP - Material Breakdown Report', 14, 15);
+
+    const rows = [];
+    reportData.forEach(group => {
+      group.flows.forEach((flow, fIdx) => {
+        rows.push([
+          fIdx === 0 ? group.party : '',
+          fIdx === 0 ? group.meal : '',
+          group.gsm, group.size, flow.prev, flow.used, flow.added, flow.avail, flow.date, flow.jobs
+        ]);
+      });
+      // Subtotal
+      rows.push({
+        content: ['Total', '', '', '', '', group.totals.used, group.totals.added, group.totals.avail, '', ''],
+        styles: { fontStyle: 'bold', fillColor: [240, 240, 240] }
+      });
+    });
+
+    autoTable(doc, {
+      head: [['Party Name', 'Meal Name', 'GSM', 'Size', 'Prev', 'Used', 'Added', 'Avail', 'Date', 'Jobs']],
+      body: rows,
+      startY: 20,
+      styles: { fontSize: 7 }
+    });
+
+    doc.save('stock_report.pdf');
   };
 
   const handleDeleteStock = (id) => {
@@ -544,8 +609,8 @@ const StockData = () => {
             <X size={14} /> Clear
           </button>
 
-          <button onClick={() => window.print()} style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
-            <FileText size={16} /> Export Data to Pdf and Send Email
+          <button onClick={exportToPDF} style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
+            <FileText size={16} /> Export Data to Pdf
           </button>
         </div>
       </div>
@@ -732,7 +797,7 @@ const StockData = () => {
               <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Material Breakdown</h2>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              <button onClick={() => window.print()} style={{ padding: '0.55rem 1.5rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button onClick={() => exportReportToPDF(reportData)} style={{ padding: '0.55rem 1.5rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <FileText size={16} /> Export Report
               </button>
             </div>

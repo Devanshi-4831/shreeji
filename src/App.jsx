@@ -11,12 +11,12 @@ import Profile from './pages/Profile.jsx';
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       
       {/* Protected Routes inside AppLayout */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Navigate to="/party-meal" replace />} />
         <Route path="/party-meal" element={<PartyMealManagement />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/stock" element={<StockData />} />

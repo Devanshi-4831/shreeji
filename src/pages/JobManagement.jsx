@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   Briefcase, Plus, Search, Filter, FileText,
   Calendar, CheckCircle2, Clock, AlertCircle,
@@ -10,7 +13,16 @@ import {
 } from 'lucide-react';
 
 const JobManagement = () => {
-  const [activeTab, setActiveTab] = useState('add-job');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'add-job');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const [search, setSearch] = useState('');
 
   // Pagination State
@@ -209,6 +221,50 @@ const JobManagement = () => {
     setJobForm(initialJobForm);
     setMaterialSpecs([{ id: Date.now(), meal: '', gsm: '', sizeCm: '', sizeInch: '-', total: '', rate: '', nxr: '', date: new Date().toLocaleDateString('en-GB').split('/').join('-'), availableStock: '0' }]);
     setActiveTab('manage-jobs');
+  };
+
+  const exportAllJobsToPDF = () => {
+    const doc = new jsPDF('landscape');
+    doc.text('Shreeji ERP - Job Records', 14, 15);
+    const tableData = jobs
+      .filter(j => j.name.toLowerCase().includes(search.toLowerCase()))
+      .map(j => [
+        j.name, j.party, j.meal, j.gsm, j.sizeCm, j.sizeInch, j.total, j.availableStock, j.rate, j.nxr, j.date, j.status
+      ]);
+
+    autoTable(doc, {
+      head: [['Job Name', 'Party', 'Meal', 'GSM', 'Size (cm)', 'Size (Inch)', 'Total', 'Avail', 'Rate', 'NXR', 'Date', 'Status']],
+      body: tableData,
+      startY: 20,
+      styles: { fontSize: 8 }
+    });
+    doc.save('all_jobs.pdf');
+  };
+
+  const exportSingleJobPDF = (job) => {
+    const doc = new jsPDF();
+    doc.text(`Job Details: ${job.name}`, 14, 15);
+    
+    const details = [
+      ['Job ID', job.id],
+      ['Party Name', job.party],
+      ['Meal Name', job.meal],
+      ['GSM', job.gsm],
+      ['Size (cm)', job.sizeCm],
+      ['Total Sheets', job.total],
+      ['Rate', job.rate],
+      ['NXR No', job.nxr],
+      ['Date', job.date],
+      ['Status', job.status]
+    ];
+
+    autoTable(doc, {
+      body: details,
+      startY: 25,
+      styles: { fontSize: 10 }
+    });
+    
+    doc.save(`job_${job.id}.pdf`);
   };
 
   const handleDeleteJob = (id) => {
@@ -680,6 +736,12 @@ const JobManagement = () => {
           <select style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', minWidth: '150px' }}>
             <option>All Paper Sizes</option>
           </select>
+          <button onClick={exportAllJobsToPDF} style={{
+            padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: 'none',
+            background: 'var(--primary)', color: '#fff', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontWeight: 600
+          }}>
+            <FileText size={16} /> Export All Jobs
+          </button>
           <button onClick={() => setSearch('')} style={{
             padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)',
             background: '#fff', color: 'var(--text-main)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer'
@@ -786,8 +848,8 @@ const JobManagement = () => {
                     }}>
                       <Edit size={12} /> Edit
                     </button>
-                    <button className="btn-action-print" onClick={() => window.print()}>
-                      <Printer size={12} /> Print
+                    <button className="btn-action-print" onClick={() => exportSingleJobPDF(job)}>
+                      <Printer size={12} /> Print PDF
                     </button>
                     <button className="btn-action-repeat" onClick={() => {
                       setActiveTab('add-job');

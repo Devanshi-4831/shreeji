@@ -1,4 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   Users, Coffee, Plus, Search, Filter,
   MapPin, Phone, User, Hash, Globe, Building2,
@@ -7,7 +10,16 @@ import {
 } from 'lucide-react';
 
 const PartyMealManagement = () => {
-  const [activeTab, setActiveTab] = useState('add-party');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'add-party');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const [search, setSearch] = useState('');
   const fileInputRef = useRef(null);
 
@@ -99,6 +111,30 @@ const PartyMealManagement = () => {
     }
   };
 
+  const exportPartiesToPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Shreeji ERP - Parties List', 14, 15);
+    const tableData = parties.map(p => [p.name, p.email, p.phone]);
+    autoTable(doc, {
+      head: [['Party Name', 'Email', 'Mobile']],
+      body: tableData,
+      startY: 20
+    });
+    doc.save('parties_list.pdf');
+  };
+
+  const exportMealsToPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Shreeji ERP - Meals List', 14, 15);
+    const tableData = meals.map(m => [m.name]);
+    autoTable(doc, {
+      head: [['Meal Name']],
+      body: tableData,
+      startY: 20
+    });
+    doc.save('meals_list.pdf');
+  };
+
   const renderAddParty = () => (
     <form onSubmit={handleAddParty} style={{
       background: 'var(--surface)', border: '1px solid var(--border-color)',
@@ -161,9 +197,14 @@ const PartyMealManagement = () => {
       background: 'var(--surface)', border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
     }}>
-      <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <Users size={18} style={{ color: 'var(--primary)' }} />
-        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Parties</span>
+      <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Users size={18} style={{ color: 'var(--primary)' }} />
+          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Parties</span>
+        </div>
+        <button onClick={exportPartiesToPDF} style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <FileText size={14} /> Export PDF
+        </button>
       </div>
 
       <div className="stock-table-container" style={{ overflowX: 'auto' }}>
@@ -272,9 +313,14 @@ const PartyMealManagement = () => {
       background: 'var(--surface)', border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
     }}>
-      <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <Coffee size={18} style={{ color: 'var(--primary)' }} />
-        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Meals</span>
+      <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Coffee size={18} style={{ color: 'var(--primary)' }} />
+          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Meals</span>
+        </div>
+        <button onClick={exportMealsToPDF} style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <FileText size={14} /> Export PDF
+        </button>
       </div>
 
       <div className="stock-table-container" style={{ overflowX: 'auto' }}>
