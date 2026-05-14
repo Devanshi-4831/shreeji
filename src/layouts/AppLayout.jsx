@@ -26,7 +26,7 @@ const AppLayout = () => {
         { label: 'Manage Parties', tab: 'manage-parties' },
         { label: 'Add Meal', tab: 'add-meal' },
         { label: 'Manage Meals', tab: 'manage-meals' },
-        { label: 'Company Info', tab: 'company-details' },
+        
       ]
     },
     { 

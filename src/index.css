@@ -339,10 +339,10 @@ button {
   /* Enable both horizontal and vertical scrolling */
   -webkit-overflow-scrolling: touch;
   width: 100%;
-  max-height: calc(100vh - 280px);
+  max-height: calc(100vh - 250px);
   /* Dynamic height based on viewport */
   /* Hide scrollbar for IE, Edge and Firefox */
- 
+
 }
 
 
@@ -388,4 +388,72 @@ button {
   height: 34px !important;
   /* Force exact row height */
 }
-.btn-action-edit { padding: 0.4rem 0.6rem !important; border-radius: 4px !important; border: none !important; background: #22C55E !important; color: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.3rem !important; cursor: pointer !important; font-size: 0.7rem !important; font-weight: 600 !important; transition: opacity 0.2s; } .btn-action-delete { padding: 0.4rem 0.6rem !important; border-radius: 4px !important; border: none !important; background: #EF4444 !important; color: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.3rem !important; cursor: pointer !important; font-size: 0.7rem !important; font-weight: 600 !important; transition: opacity 0.2s; } .btn-action-print { padding: 0.4rem 0.6rem !important; border-radius: 4px !important; border: none !important; background: #3B82F6 !important; color: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.3rem !important; cursor: pointer !important; font-size: 0.7rem !important; font-weight: 600 !important; } .btn-action-repeat { padding: 0.4rem 0.6rem !important; border-radius: 4px !important; border: none !important; background: #F97316 !important; color: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.3rem !important; cursor: pointer !important; font-size: 0.7rem !important; font-weight: 600 !important; } .btn-action-edit:hover, .btn-action-delete:hover, .btn-action-print:hover, .btn-action-repeat:hover { opacity: 0.9; }
+
+.btn-action-edit {
+  padding: 0.4rem 0.6rem !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: #22C55E !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.3rem !important;
+  cursor: pointer !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  transition: opacity 0.2s;
+}
+
+.btn-action-delete {
+  padding: 0.4rem 0.6rem !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: #EF4444 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.3rem !important;
+  cursor: pointer !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  transition: opacity 0.2s;
+}
+
+.btn-action-print {
+  padding: 0.4rem 0.6rem !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: #3B82F6 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.3rem !important;
+  cursor: pointer !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+}
+
+.btn-action-repeat {
+  padding: 0.4rem 0.6rem !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: #F97316 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.3rem !important;
+  cursor: pointer !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+}
+
+.btn-action-edit:hover,
+.btn-action-delete:hover,
+.btn-action-print:hover,
+.btn-action-repeat:hover {
+  opacity: 0.9;
+}

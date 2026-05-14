@@ -238,33 +238,194 @@ const JobManagement = () => {
       startY: 20,
       styles: { fontSize: 8 }
     });
-    doc.save('all_jobs.pdf');
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   const exportSingleJobPDF = (job) => {
     const doc = new jsPDF();
-    doc.text(`Job Details: ${job.name}`, 14, 15);
-    
-    const details = [
-      ['Job ID', job.id],
-      ['Party Name', job.party],
-      ['Meal Name', job.meal],
-      ['GSM', job.gsm],
-      ['Size (cm)', job.sizeCm],
-      ['Total Sheets', job.total],
-      ['Rate', job.rate],
-      ['NXR No', job.nxr],
-      ['Date', job.date],
-      ['Status', job.status]
-    ];
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentWidth = pageWidth - (margin * 2);
 
-    autoTable(doc, {
-      body: details,
-      startY: 25,
-      styles: { fontSize: 10 }
-    });
-    
-    doc.save(`job_${job.id}.pdf`);
+    // Page Border
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
+    // Header
+    doc.setFont("times", "bold");
+    doc.setFontSize(19);
+    doc.setTextColor(44, 62, 80); // #2c3e50
+    doc.text("SHREEJI PRINT & PACK", pageWidth / 2, 15, { align: 'center' });
+
+    doc.setFontSize(17);
+    doc.setTextColor(231, 76, 60); // #e74c3c
+    doc.text("JOB CARD", pageWidth / 2, 23, { align: 'center' });
+
+    doc.setTextColor(44, 62, 80);
+    doc.setFontSize(16);
+    doc.text(job.party || "test party", 10, 32);
+
+    // Row: NXR, Rate and Chalan Date
+    doc.setFontSize(11);
+    doc.setFont("times", "bold");
+    let headerY = 40;
+
+    // Left side: NXR and Rate
+    const nxrText = `NXR-1: ${job.nxr || "2"}`;
+    doc.text(nxrText, 10, headerY);
+    const nxrWidth = doc.getTextWidth(nxrText);
+    doc.setFont("times", "normal");
+    doc.text(` [Rate-1: ${job.rate || "5"}]`, 10 + nxrWidth, headerY);
+
+    // Right side: Chalan Date
+    doc.setFont("times", "bold");
+    doc.text(`CHALAN DATE-1: ${job.date || "12/03/2026"}`, pageWidth - 11, headerY, { align: 'right' });
+
+    // Row: DATE and SR NO
+    headerY += 8;
+    doc.setFont("times", "bold");
+    doc.text("DATE:", 10, headerY);
+    doc.setFont("times", "normal");
+    doc.text(job.date || "12/03/2026", 23, headerY);
+
+    doc.setFont("times", "bold");
+    doc.text("SR NO:", pageWidth - 35, headerY);
+    doc.setTextColor(231, 76, 60);
+    doc.setFontSize(14);
+    const rawId = String(job.id || "1").replace('SJP-', '');
+    const serialStr = rawId.padStart(2, '0');
+    doc.text(serialStr, pageWidth - 20, headerY);
+
+    // separator line (Thick Blue Line)
+    doc.setTextColor(44, 62, 80);
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.8);
+    doc.line(10, headerY + 3, pageWidth - 10, headerY + 3);
+
+    let y = headerY + 11; // Gap between blue line and first row
+    const rowHeight = 8;
+
+    const drawFormLine = (label, value, x, endX) => {
+      const KEY_LINE_GAP = 2;
+      doc.setFont("times", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(44, 62, 80);
+      doc.text(label, x, y);
+
+      const labelWidth = doc.getTextWidth(label);
+      const lineStartX = x + labelWidth + KEY_LINE_GAP;
+
+      doc.setFont("times", "normal");
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text(String(value || ""), lineStartX + 1, y - 0.5);
+
+      doc.setDrawColor(65, 65, 65); // Light grey line
+      doc.setLineWidth(0.3);
+      doc.line(lineStartX, y + 0.5, endX, y + 0.5);
+    };
+
+    // Form Content
+    drawFormLine("JOB NAME: ", job.name, 10, 105);
+    drawFormLine("IMPRESSION: ", job.impression, 110, 200);
+    y += rowHeight;
+
+    drawFormLine("MACHIN 2 COLOR: ", job.machine2, 10, 75);
+    drawFormLine("5 COLOR: ", job.machine5, 80, 140);
+    drawFormLine("PKD: ", job.pkd, 145, 200);
+    y += rowHeight;
+
+    drawFormLine("COLOR: ", job.color, 10, 75);
+    drawFormLine("SPECIAL: ", job.special, 80, 140);
+    drawFormLine("INK CODE NO: ", job.inkCode, 145, 200);
+    y += rowHeight;
+
+    drawFormLine("PARTY APPROVED SAMPLE: ", job.partySample, 10, 145);
+    y += rowHeight;
+
+    drawFormLine("NEW JOB/OLD JOB: ", job.jobType, 10, 80);
+    drawFormLine("CTP: ", job.ctpNo, 85, 140);
+    drawFormLine("GSM: ", job.gsm, 145, 185);
+
+    y += rowHeight + 4;
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.3);
+    doc.line(10, y - 7, 200, y - 7); // Section divider
+
+    // Paper Size Section
+    drawFormLine("PAPER SIZE-1: ", job.sizeCm ? `${job.sizeCm} cm` : "", 10, 90);
+    drawFormLine("", job.sizeInch ? `${job.sizeInch} inch` : "", 91, 135);
+    drawFormLine("TOTAL QTY-1: ", job.total, 140, 200);
+    y += rowHeight;
+
+    drawFormLine("CUTTING SIZE: ", job.cuttingSize, 10, 105);
+    drawFormLine("CUTTING WASTAGE: ", job.cuttingWastage, 110, 200);
+    y += rowHeight;
+
+    drawFormLine("PRINTING WASTAGE: ", job.printingWastage, 10, 140);
+    drawFormLine("QTY: ", job.printingWastageQty, 145, 200);
+
+    y += rowHeight + 4;
+    doc.setDrawColor(44, 62, 80);
+    doc.line(10, y - 7, 200, y - 7); // Section divider
+
+    drawFormLine("VARNISH: ", job.varnish, 10, 110);
+    y += rowHeight;
+
+    drawFormLine("LAMINATION: ", job.lamination, 10, 75);
+    drawFormLine("SIZE: ", job.laminationSize, 80, 135);
+    drawFormLine("QTY: ", job.laminationQty, 140, 200);
+    y += rowHeight;
+
+    drawFormLine("UV/DRIP OF UV: ", job.uv, 10, 75);
+    drawFormLine("SIZE: ", job.uvSize, 80, 135);
+    drawFormLine("QTY: ", job.uvQty, 140, 200);
+    y += rowHeight;
+
+    drawFormLine("PUNCHING: ", job.punching, 10, 105);
+    drawFormLine("SIZE: ", job.punchingSize, 110, 200);
+    y += rowHeight;
+
+    drawFormLine("SIDE PASTING: ", job.sidePasting, 10, 105);
+    drawFormLine("SIZE: ", job.sidePastingSize, 110, 200);
+    y += rowHeight;
+
+    drawFormLine("FINAL QTY: ", job.finalQty, 10, 105);
+    drawFormLine("NO OF BUNDLE: ", job.noOfBundle, 110, 200);
+    y += rowHeight;
+
+    // Signature Section
+    // Gap between last row and dotted line
+    doc.setLineDash([1, 1], 0);
+    doc.setDrawColor(189, 195, 199);
+    doc.line(10, y, 200, y);
+    doc.setLineDash([], 0);
+    y += 7;
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(44, 62, 80);
+    doc.text("PRINTING OPERATOR SIGN:", 10, y);
+    doc.text("PRINTING SUPERVISOR SIGN:", 110, y);
+    y += 10;
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.4);
+    doc.line(10, y, 95, y);
+    doc.line(110, y, 200, y);
+
+    y += 7;
+    doc.text("JOB MAKER SIGN:", 10, y);
+    y += 10;
+    doc.line(10, y, 95, y);
+
+    // Output
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   const handleDeleteJob = (id) => {
@@ -736,12 +897,7 @@ const JobManagement = () => {
           <select style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', minWidth: '150px' }}>
             <option>All Paper Sizes</option>
           </select>
-          <button onClick={exportAllJobsToPDF} style={{
-            padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: 'none',
-            background: 'var(--primary)', color: '#fff', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontWeight: 600
-          }}>
-            <FileText size={16} /> Export All Jobs
-          </button>
+
           <button onClick={() => setSearch('')} style={{
             padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)',
             background: '#fff', color: 'var(--text-main)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer'
@@ -774,7 +930,6 @@ const JobManagement = () => {
                 <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0' }}>{job.sizeCm}</td>
                 <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0' }}>{job.sizeInch}</td>
                 <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0' }}>{job.total}</td>
-                <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0', fontWeight: 700, color: '#10B981' }}>{job.availableStock}</td>
                 <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0' }}>{job.rate}</td>
                 <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0' }}>{job.nxr}</td>
                 <td style={{ padding: '0.75rem 1rem', borderRight: '1px solid #E2E8F0' }}>{job.date}</td>
@@ -802,19 +957,19 @@ const JobManagement = () => {
                       style={{
                         padding: '0.4rem 0.6rem 0.4rem 1.8rem', borderRadius: '999px',
                         border: `1px solid ${job.status === 'Job Completed' ? '#10B981' :
-                            job.status === 'Job Cancel' ? '#EF4444' :
-                              job.status === 'Job in Hold' ? '#F59E0B' :
-                                job.status === 'Job in Running' ? '#A855F7' : '#1D4ED8'
+                          job.status === 'Job Cancel' ? '#EF4444' :
+                            job.status === 'Job in Hold' ? '#F59E0B' :
+                              job.status === 'Job in Running' ? '#A855F7' : '#1D4ED8'
                           }`,
                         background: `${job.status === 'Job Completed' ? '#10B98115' :
-                            job.status === 'Job Cancel' ? '#EF444415' :
-                              job.status === 'Job in Hold' ? '#F59E0B15' :
-                                job.status === 'Job in Running' ? '#A855F715' : '#1D4ED815'
+                          job.status === 'Job Cancel' ? '#EF444415' :
+                            job.status === 'Job in Hold' ? '#F59E0B15' :
+                              job.status === 'Job in Running' ? '#A855F715' : '#1D4ED815'
                           }`,
                         color: `${job.status === 'Job Completed' ? '#10B981' :
-                            job.status === 'Job Cancel' ? '#EF4444' :
-                              job.status === 'Job in Hold' ? '#D97706' :
-                                job.status === 'Job in Running' ? '#A855F7' : '#1D4ED8'
+                          job.status === 'Job Cancel' ? '#EF4444' :
+                            job.status === 'Job in Hold' ? '#D97706' :
+                              job.status === 'Job in Running' ? '#A855F7' : '#1D4ED8'
                           }`,
                         fontSize: '0.7rem', fontWeight: 800,
                         cursor: 'pointer', outline: 'none', appearance: 'none', minWidth: '150px'
