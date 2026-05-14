@@ -9,6 +9,7 @@ import {
   TrendingUp, Activity, BarChart3, User, Coffee,
   Hash, Calendar, Layers, Maximize, Briefcase
 } from 'lucide-react';
+import EmailModal from '../components/EmailModal';
 
 const StockData = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +23,14 @@ const StockData = () => {
   }, [searchParams]);
 
   const [search, setSearch] = useState('');
+
+  const companyInfo = {
+    name: 'Shreeji Print Pack',
+    address: '21, Silver Plaza, Station Road, Bhavnagar - 364001, Gujarat, India.',
+    email: 'info@shreejetrading.com',
+    phone: '8754545878',
+    gst: '24ABCDE1234F1Z5'
+  };
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,6 +70,18 @@ const StockData = () => {
     { id: 504, isJob: true, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '0', totalSheet: '-200', date: '10-Mar-2026', invoice: '-', jobDesc: 'test job 2 with Nxr:1 - closed, Nxr:3 - 22 sheets remaining' },
     { id: 505, isJob: true, party: 'test party', meal: 'test meal', gsm: 90, sizeCm: '90 x 90 cm', sizeInch: '35.43 x 35.43 inch', grandTotal: '0', totalSheet: '-22', date: '10-Mar-2026', invoice: '-', jobDesc: 'test job 4 with Nxr:3 - closed' },
   ]);
+
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [filterParty, setFilterParty] = useState('All Parties');
+  const [filterMeal, setFilterMeal] = useState('All Meals');
+  const [filterSize, setFilterSize] = useState('All Paper Sizes');
+  const [reportParty, setReportParty] = useState('All Parties');
+  const [reportJob, setReportJob] = useState('All Jobs');
+
+  // Get unique lists for filters
+  const uniqueParties = [...new Set(stockItems.map(item => item.party))].sort();
+  const uniqueMeals = [...new Set(stockItems.map(item => item.meal))].sort();
+  const uniqueSizes = [...new Set(stockItems.map(item => item.sizeCm))].sort();
 
   const [stockForm, setStockForm] = useState({
     party: '',
@@ -212,8 +233,34 @@ const StockData = () => {
 
   const exportToPDF = () => {
     const doc = new jsPDF('landscape');
-    doc.text('Shreeji ERP - Stock Inventory', 14, 15);
-    
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Page Border
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
+    // Header
+    doc.setFont("times", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(44, 62, 80);
+    doc.text(companyInfo.name, pageWidth / 2, 15, { align: 'center' });
+
+    doc.setFontSize(18);
+    doc.setTextColor(231, 76, 60);
+    doc.text("STOCK INVENTORY REPORT", pageWidth / 2, 23, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setTextColor(85, 85, 85);
+    doc.setFont("times", "normal");
+    doc.text(companyInfo.address, pageWidth / 2, 30, { align: 'center' });
+    doc.text(`Email: ${companyInfo.email} | GST: ${companyInfo.gst} | Mobile: ${companyInfo.phone}`, pageWidth / 2, 35, { align: 'center' });
+
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.5);
+    doc.line(10, 40, pageWidth - 10, 40);
+
     const tableData = stockItems
       .filter(s => !s.isJob && (s.party.toLowerCase().includes(search.toLowerCase()) || s.meal.toLowerCase().includes(search.toLowerCase())))
       .map(s => [
@@ -223,44 +270,124 @@ const StockData = () => {
       ]);
 
     autoTable(doc, {
-      head: [['Party', 'Meal', 'Invoice', 'Bundle No', 'Per Bundle Rim', 'Total Rim', 'Sheets in Rim', 'Total Sheet', 'Grand Total', 'Weight', 'Size (cm)', 'Size (inch)', 'GSM', 'NXR No', 'Rate', 'Date']],
+      head: [['Party', 'Meal', 'Invoice', 'Bundle', 'PBR', 'Total R', 'SIR', 'TS', 'G.Total', 'Weight', 'Size(cm)', 'Size(in)', 'GSM', 'NXR', 'Rate', 'Date']],
       body: tableData,
-      startY: 20,
-      styles: { fontSize: 8 },
-      headStyles: { fillStyle: 'var(--primary)' }
+      startY: 45,
+      styles: { fontSize: 7, font: 'times' },
+      headStyles: { fillColor: [44, 62, 80], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 245] }
     });
-    
-    doc.save('stock_inventory.pdf');
+
+    // Signature
+    const finalY = doc.lastAutoTable.finalY || 150;
+    if (finalY + 30 < pageHeight) {
+      doc.setFontSize(10);
+      doc.setFont("times", "bold");
+      doc.text("Authorized Signature", pageWidth - 20, pageHeight - 20, { align: 'right' });
+      doc.line(pageWidth - 60, pageHeight - 18, pageWidth - 10, pageHeight - 18);
+    }
+
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   const exportReportToPDF = (reportData) => {
     const doc = new jsPDF('landscape');
-    doc.text('Shreeji ERP - Material Breakdown Report', 14, 15);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Title: Stock Report
+    doc.setFont("times", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(26, 82, 118); // Blue color
+    doc.text("Stock Report", pageWidth / 2, 15, { align: 'center' });
+
+    // Blue Horizontal Line
+    doc.setDrawColor(26, 82, 118);
+    doc.setLineWidth(0.5);
+    doc.line(20, 22, pageWidth - 20, 22);
+
+    // Generated Date (Right Aligned)
+    doc.setFontSize(10);
+    doc.setTextColor(85, 85, 85);
+    doc.setFont("times", "normal");
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')}`, pageWidth - 20, 28, { align: 'right' });
 
     const rows = [];
-    reportData.forEach(group => {
+    Object.values(reportData).forEach(group => {
+      const numFlows = group.flows.length;
+      // Each group has numFlows + 1 (for the Total row)
+      const totalGroupRows = numFlows + 1;
+
       group.flows.forEach((flow, fIdx) => {
-        rows.push([
-          fIdx === 0 ? group.party : '',
-          fIdx === 0 ? group.meal : '',
-          group.gsm, group.size, flow.prev, flow.used, flow.added, flow.avail, flow.date, flow.jobs
-        ]);
+        const row = [];
+        if (fIdx === 0) {
+          row.push({ content: group.party, rowSpan: totalGroupRows, styles: { valign: 'middle', halign: 'left' } });
+          row.push({ content: group.meal, rowSpan: totalGroupRows, styles: { valign: 'middle', halign: 'left' } });
+        }
+        row.push(group.gsm);
+        row.push(group.size);
+        row.push(flow.prev);
+        row.push(flow.used);
+        row.push(flow.added);
+        row.push(flow.avail);
+        row.push(flow.date);
+        row.push(flow.jobs);
+        rows.push(row);
       });
-      // Subtotal
-      rows.push({
-        content: ['Total', '', '', '', '', group.totals.used, group.totals.added, group.totals.avail, '', ''],
-        styles: { fontStyle: 'bold', fillColor: [240, 240, 240] }
-      });
+
+      // Total Row for this group
+      rows.push([
+        // Party and Meal are covered by rowSpan
+        { content: 'Total', styles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: '', styles: { fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: '', styles: { fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: group.totals.used > 0 ? group.totals.used.toString() : '', styles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: group.totals.added.toString(), styles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: group.totals.avail.toString(), styles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: '', styles: { fillColor: [241, 245, 249], textColor: [26, 82, 118] } },
+        { content: '', styles: { fillColor: [241, 245, 249], textColor: [26, 82, 118] } }
+      ]);
     });
 
     autoTable(doc, {
-      head: [['Party Name', 'Meal Name', 'GSM', 'Size', 'Prev', 'Used', 'Added', 'Avail', 'Date', 'Jobs']],
+      head: [['Party Name', 'Meal Name', 'GSM', 'Size (cm)', 'Previous Stock', 'Used Stock', 'Added Stock', 'Available Stock', 'Date', 'Jobs']],
       body: rows,
-      startY: 20,
-      styles: { fontSize: 7 }
+      startY: 32,
+      theme: 'grid',
+      styles: {
+        fontSize: 9, // Slightly smaller for better fit
+        font: 'times',
+        cellPadding: 1.2,
+        lineColor: [200, 200, 200],
+        minCellHeight: 5
+      },
+      headStyles: {
+        fillColor: [255, 255, 255],
+        textColor: [26, 82, 118],
+        fontStyle: 'bold',
+        halign: 'center',
+        lineWidth: 0.1,
+        lineColor: [200, 200, 200]
+      },
+      columnStyles: {
+        0: { cellWidth: 32 }, // Party Name
+        1: { cellWidth: 22 }, // Meal Name
+        2: { halign: 'center', cellWidth: 10 }, // GSM
+        3: { halign: 'center', cellWidth: 30 }, // Size (cm) - Increased
+        4: { halign: 'center', cellWidth: 16 },
+        5: { halign: 'center', cellWidth: 16 },
+        6: { halign: 'center', cellWidth: 16 },
+        7: { halign: 'center', cellWidth: 16 },
+        8: { halign: 'center', cellWidth: 20 },
+        9: { halign: 'left', cellWidth: 'auto' } // Jobs - Adjusts as per content
+      }
     });
 
-    doc.save('stock_report.pdf');
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   const handleDeleteStock = (id) => {
@@ -579,113 +706,152 @@ const StockData = () => {
     </form>
   );
 
-  const renderManageStock = () => (
-    <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border-color)',
-      borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
-    }}>
-      {/* Header & Search Bar */}
-      <div style={{ padding: '0.5rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(79, 70, 229, 0.05)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Package size={20} style={{ color: 'var(--primary)' }} />
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Stock Inventory</h2>
-        </div>
+  const renderManageStock = () => {
+    const filteredItems = stockItems.filter(s => {
+      if (s.isJob) return false;
+      const matchesSearch = s.party.toLowerCase().includes(search.toLowerCase()) || s.meal.toLowerCase().includes(search.toLowerCase());
+      const matchesParty = filterParty === 'All Parties' || s.party === filterParty;
+      const matchesMeal = filterMeal === 'All Meals' || s.meal === filterMeal;
+      const matchesSize = filterSize === 'All Paper Sizes' || s.sizeCm === filterSize;
+      return matchesSearch && matchesParty && matchesMeal && matchesSize;
+    });
 
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ position: 'relative', width: '220px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input
-              type="text" placeholder="Search stock..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                width: '100%', padding: '0.55rem 1rem 0.55rem 2.5rem', borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.85rem'
-              }}
-            />
+    const totalFiltered = filteredItems.length;
+
+    return (
+      <div style={{
+        background: 'var(--surface)', border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
+      }}>
+        {/* Header & Search Bar */}
+        <div style={{ padding: '0.5rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(79, 70, 229, 0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Package size={20} style={{ color: 'var(--primary)' }} />
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Stock Inventory</h2>
           </div>
 
-          <button onClick={() => setSearch('')} style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 600 }}>
-            <X size={14} /> Clear
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: '220px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text" placeholder="Search stock..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  width: '100%', padding: '0.55rem 1rem 0.55rem 2.5rem', borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.85rem'
+                }}
+              />
+            </div>
 
-          <button onClick={exportToPDF} style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
-            <FileText size={16} /> Export Data to Pdf
-          </button>
+            <select
+              value={filterParty}
+              onChange={(e) => setFilterParty(e.target.value)}
+              style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', outline: 'none' }}
+            >
+              <option>All Parties</option>
+              {uniqueParties.map(p => <option key={p}>{p}</option>)}
+            </select>
+
+            <select
+              value={filterMeal}
+              onChange={(e) => setFilterMeal(e.target.value)}
+              style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', outline: 'none' }}
+            >
+              <option>All Meals</option>
+              {uniqueMeals.map(m => <option key={m}>{m}</option>)}
+            </select>
+
+            <select
+              value={filterSize}
+              onChange={(e) => setFilterSize(e.target.value)}
+              style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', outline: 'none' }}
+            >
+              <option>All Paper Sizes</option>
+              {uniqueSizes.map(s => <option key={s}>{s}</option>)}
+            </select>
+
+            <button onClick={() => { setSearch(''); setFilterParty('All Parties'); setFilterMeal('All Meals'); setFilterSize('All Paper Sizes'); }} style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 600 }}>
+              <X size={14} /> Clear
+            </button>
+
+            <button onClick={() => setIsEmailModalOpen(true)} style={{ padding: '0.55rem 1rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
+              <Mail size={16} /> Export Data to Pdf and Send Email
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Table Section */}
-      <div className="stock-table-container" style={{ overflowX: 'auto' }}>
-        <table className="stock-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
-          <thead>
-            <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
-              {[
-                'Party', 'Meal', 'Invoice', 'Bundle No', 'Per Bundle Rim', 'Total Rim',
-                'Sheets in Rim', 'Total Sheet', 'Grand Total Sheet', 'Weight',
-                'Size (cm)', 'Size (inch)', 'GSM', 'NXR No', 'Rate', 'Chalan Date', 'Actions'
-              ].map(h => (
-                <th key={h} style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'none', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {stockItems.filter(s => !s.isJob && (s.party.toLowerCase().includes(search.toLowerCase()) || s.meal.toLowerCase().includes(search.toLowerCase()))).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map(s => (
-              <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
-                <td style={{ padding: '0.45rem 0.75rem', fontWeight: 500, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.party}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.meal}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.invoice}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.bundleNo}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.perBundleRim}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.totalRim}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.sheetsInRim}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.totalSheet}</td>
-                <td style={{ padding: '0.45rem 0.75rem', fontWeight: 700, color: 'var(--primary)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.grandTotal}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.weight} kg</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.sizeCm}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.sizeInch}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.gsm}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.nxr}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.rate ? `₹${s.rate}` : ''}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.date}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
-                  <div style={{ display: 'flex', gap: '0.4rem' }}>
-                    <button className="btn-action-edit" onClick={() => {
-                      setActiveTab('add');
-                      const unit = s.sizeCm.toLowerCase().includes('cm') ? 'cm' : 'inch';
-                      setStockForm({
-                        ...s,
-                        nxr: s.nxr,
-                        rate: s.rate
-                      });
-                      setStockSpecs([{
-                        ...s,
-                        id: Date.now(),
-                        gsm: s.gsm,
-                        size: unit === 'cm' ? s.sizeCm.replace(' cm', '') : s.sizeInch.replace(' inch', ''),
-                        sizeUnit: unit,
-                        convSize: unit === 'cm' ? s.sizeInch : s.sizeCm,
-                        mode: 'manual'
-                      }]);
-                    }}>
-                      <Edit size={14} /> Edit
-                    </button>
-                    <button className="btn-action-delete" onClick={() => handleDeleteStock(s.id)}>
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
-                </td>
+        {/* Table Section */}
+        <div className="stock-table-container" style={{ overflowX: 'auto' }}>
+          <table className="stock-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
+                {[
+                  'Party', 'Meal', 'Invoice', 'Bundle No', 'Per Bundle Rim', 'Total Rim',
+                  'Sheets in Rim', 'Total Sheet', 'Grand Total Sheet', 'Weight',
+                  'Size (cm)', 'Size (inch)', 'GSM', 'NXR No', 'Rate', 'Chalan Date', 'Actions'
+                ].map(h => (
+                  <th key={h} style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'none', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination Footer */}
-      <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, stockItems.length)} to {Math.min(currentPage * rowsPerPage, stockItems.length)} of {stockItems.length} entries
+            </thead>
+            <tbody>
+              {filteredItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map(s => (
+                <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
+                  <td style={{ padding: '0.45rem 0.75rem', fontWeight: 500, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.party}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.meal}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.invoice}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.bundleNo}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.perBundleRim}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.totalRim}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.sheetsInRim}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.totalSheet}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', fontWeight: 700, color: 'var(--primary)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.grandTotal}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.weight} kg</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.sizeCm}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.sizeInch}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.gsm}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.nxr}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.rate ? `₹${s.rate}` : ''}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{s.date}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      <button className="btn-action-edit" onClick={() => {
+                        setActiveTab('add');
+                        const unit = s.sizeCm.toLowerCase().includes('cm') ? 'cm' : 'inch';
+                        setStockForm({
+                          ...s,
+                          nxr: s.nxr,
+                          rate: s.rate
+                        });
+                        setStockSpecs([{
+                          ...s,
+                          id: Date.now(),
+                          gsm: s.gsm,
+                          size: unit === 'cm' ? s.sizeCm.replace(' cm', '') : s.sizeInch.replace(' inch', ''),
+                          sizeUnit: unit,
+                          convSize: unit === 'cm' ? s.sizeInch : s.sizeCm,
+                          mode: 'manual'
+                        }]);
+                      }}>
+                        <Edit size={14} /> Edit
+                      </button>
+                      <button className="btn-action-delete" onClick={() => handleDeleteStock(s.id)}>
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination Footer */}
+        <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Showing {totalFiltered > 0 ? (currentPage - 1) * rowsPerPage + 1 : 0} to {Math.min(currentPage * rowsPerPage, totalFiltered)} of {totalFiltered} entries
+          </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
@@ -713,7 +879,7 @@ const StockData = () => {
               <ChevronLeft size={16} />
             </button>
 
-            {[...Array(Math.max(1, Math.ceil(stockItems.length / rowsPerPage)))].map((_, i) => (
+            {[...Array(Math.max(1, Math.ceil(totalFiltered / rowsPerPage)))].map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
@@ -730,9 +896,9 @@ const StockData = () => {
             ))}
 
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(stockItems.length / rowsPerPage)))}
-              disabled={currentPage === Math.ceil(stockItems.length / rowsPerPage) || stockItems.length === 0}
-              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: (currentPage === Math.ceil(stockItems.length / rowsPerPage) || stockItems.length === 0) ? '#ccc' : 'var(--text-muted)', cursor: (currentPage === Math.ceil(stockItems.length / rowsPerPage) || stockItems.length === 0) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(totalFiltered / rowsPerPage)))}
+              disabled={currentPage === Math.ceil(totalFiltered / rowsPerPage) || totalFiltered === 0}
+              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: (currentPage === Math.ceil(totalFiltered / rowsPerPage) || totalFiltered === 0) ? '#ccc' : 'var(--text-muted)', cursor: (currentPage === Math.ceil(totalFiltered / rowsPerPage) || totalFiltered === 0) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <ChevronRight size={16} />
             </button>
@@ -741,41 +907,48 @@ const StockData = () => {
       </div>
     </div>
   );
+};
 
   const renderStockReport = () => {
-    // Dynamically calculate report data based on stockItems
+    // Dynamically calculate report data based on filtered stockItems
     const groupedData = {};
 
-    stockItems.forEach(item => {
-      const key = `${item.party}|${item.meal}|${item.gsm}|${item.sizeCm}`;
-      if (!groupedData[key]) {
-        groupedData[key] = {
-          party: item.party,
-          meal: item.meal,
-          gsm: item.gsm,
-          size: item.sizeCm,
-          flows: [],
-          totals: { used: 0, added: 0, avail: 0 }
-        };
-      }
+    stockItems
+      .filter(item => {
+        const matchParty = reportParty === 'All Parties' || item.party === reportParty;
+        const matchJob = reportJob === 'All Jobs' || item.meal === reportJob;
+        return matchParty && matchJob;
+      })
+      .forEach(item => {
+        const key = `${item.party}|${item.meal}|${item.gsm}|${item.sizeCm}`;
+        if (!groupedData[key]) {
+          groupedData[key] = {
+            party: item.party,
+            meal: item.meal,
+            gsm: item.gsm,
+            size: item.sizeCm,
+            flows: [],
+            totals: { used: 0, added: 0, avail: 0 }
+          };
+        }
 
-      const added = parseFloat(item.grandTotal) || 0;
-      const avail = parseFloat(item.totalSheet) || 0;
-      const used = added - avail;
+        const added = parseFloat(item.grandTotal) || 0;
+        const avail = parseFloat(item.totalSheet) || 0;
+        const used = added - avail;
 
-      groupedData[key].flows.push({
-        prev: (groupedData[key].totals.avail).toString(),
-        used: used > 0 ? used.toString() : '',
-        added: added.toString(),
-        avail: (groupedData[key].totals.avail + added - used).toString(),
-        date: item.date || 'N/A',
-        jobs: item.jobDesc || (used > 0 ? `Used ${used} sheets` : 'Stock Added')
+        groupedData[key].flows.push({
+          prev: (groupedData[key].totals.avail).toString(),
+          used: used > 0 ? used.toString() : '',
+          added: added.toString(),
+          avail: (groupedData[key].totals.avail + added - used).toString(),
+          date: item.date || 'N/A',
+          jobs: item.jobDesc || (used > 0 ? `Used ${used} sheets` : 'Stock Added')
+        });
+
+        groupedData[key].totals.added += added;
+        groupedData[key].totals.avail += avail;
+        groupedData[key].totals.used += used;
       });
-
-      groupedData[key].totals.added += added;
-      groupedData[key].totals.avail += avail;
-      groupedData[key].totals.used += used;
-    });
 
     const reportData = Object.values(groupedData);
 
@@ -794,11 +967,32 @@ const StockData = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <BarChart3 size={20} style={{ color: 'var(--primary)' }} />
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Material Breakdown</h2>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>Stock Report</h2>
             </div>
+            
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Party Filter */}
+              <select 
+                value={reportParty} 
+                onChange={(e) => setReportParty(e.target.value)}
+                style={{ padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+              >
+                <option value="All Parties">All Parties</option>
+                {uniqueParties.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+
+              {/* Job Filter */}
+              <select 
+                value={reportJob} 
+                onChange={(e) => setReportJob(e.target.value)}
+                style={{ padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+              >
+                <option value="All Jobs">All Jobs</option>
+                {uniqueMeals.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+
               <button onClick={() => exportReportToPDF(reportData)} style={{ padding: '0.55rem 1.5rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileText size={16} /> Export Report
+                <FileText size={16} /> Generate PDF
               </button>
             </div>
           </div>
@@ -900,6 +1094,20 @@ const StockData = () => {
       {activeTab === 'add' && renderAddStock()}
       {activeTab === 'manage' && renderManageStock()}
       {activeTab === 'report' && renderStockReport()}
+
+      <EmailModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        parties={uniqueParties}
+        stockItems={stockItems}
+        companyDetails={{
+          name: 'Shreeji Print Pack',
+          email: 'info70@unrietrading.com',
+          phone: '6754345678',
+          gst: '24ABCDE1234F1Z5',
+          address: '21, Silver Plaza, Station Road, Bhavnagar – 364001, Gujarat, India.'
+        }}
+      />
 
       <style>{`
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
