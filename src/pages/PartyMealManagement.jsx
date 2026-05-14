@@ -45,15 +45,6 @@ const PartyMealManagement = () => {
     { id: 3, name: 'Kherani Paper' },
   ]);
 
-  // Company Info State
-  const [companyInfo, setCompanyInfo] = useState({
-    name: 'Shreeji Print Pack',
-    email: 'info70@unrietrading.com',
-    phone: '6754345678',
-    gst: '24ABCDE1234F1Z5',
-    address: '21, Silver Plaza, Station Road, Bhavnagar – 364001, Gujarat, India.',
-    logo: null
-  });
 
   const [partyForm, setPartyForm] = useState({ name: '', email: '', phone: '' });
   const [mealForm, setMealForm] = useState({ name: '' });
@@ -120,7 +111,9 @@ const PartyMealManagement = () => {
       body: tableData,
       startY: 20
     });
-    doc.save('parties_list.pdf');
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   const exportMealsToPDF = () => {
@@ -132,7 +125,9 @@ const PartyMealManagement = () => {
       body: tableData,
       startY: 20
     });
-    doc.save('meals_list.pdf');
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   const renderAddParty = () => (
@@ -143,36 +138,36 @@ const PartyMealManagement = () => {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem' }}>
         <div style={{ width: '400px' }}>
           <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Party Name *</label>
-          <input 
-            type="text" 
-            placeholder="Enter party name" 
-            required 
+          <input
+            type="text"
+            placeholder="Enter party name"
+            required
             value={partyForm.name}
-            onChange={(e) => setPartyForm({...partyForm, name: e.target.value})}
-            style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+            onChange={(e) => setPartyForm({ ...partyForm, name: e.target.value })}
+            style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
           />
         </div>
         <div style={{ width: '300px' }}>
           <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Email *</label>
-          <input 
-            type="email" 
-            placeholder="Enter email address" 
-            required 
+          <input
+            type="email"
+            placeholder="Enter email address"
+            required
             value={partyForm.email}
-            onChange={(e) => setPartyForm({...partyForm, email: e.target.value})}
-            style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+            onChange={(e) => setPartyForm({ ...partyForm, email: e.target.value })}
+            style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
           />
         </div>
         <div style={{ width: '250px' }}>
           <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Mobile *</label>
-          <input 
-            type="text" 
-            placeholder="Enter 10-digit mobile number" 
-            required 
-            maxLength={10} 
+          <input
+            type="text"
+            placeholder="Enter 10-digit mobile number"
+            required
+            maxLength={10}
             value={partyForm.phone}
-            onChange={(e) => setPartyForm({...partyForm, phone: e.target.value})}
-            style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }} 
+            onChange={(e) => setPartyForm({ ...partyForm, phone: e.target.value })}
+            style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-main)', fontSize: '0.9rem' }}
           />
         </div>
       </div>
@@ -193,83 +188,98 @@ const PartyMealManagement = () => {
     const partyTotalPages = Math.max(1, Math.ceil(totalParties / partyRowsPerPage));
     const pagedParties = parties.slice((partyPage - 1) * partyRowsPerPage, partyPage * partyRowsPerPage);
     return (
-    <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border-color)',
-      borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
-    }}>
-      <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Users size={18} style={{ color: 'var(--primary)' }} />
-          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Parties</span>
-        </div>
-        <button onClick={exportPartiesToPDF} style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-          <FileText size={14} /> Export PDF
-        </button>
-      </div>
+      <div style={{
+        background: 'var(--surface)', border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
+      }}>
+        <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Users size={18} style={{ color: 'var(--primary)' }} />
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Parties</span>
+          </div>
 
-      <div className="stock-table-container" style={{ overflowX: 'auto' }}>
-        <table className="stock-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
-          <thead>
-            <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
-              {['Party Name', 'Email', 'Mobile', 'Actions'].map(h => (
-                <th key={h} style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {pagedParties.map(p => (
-              <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
-                <td style={{ padding: '0.45rem 0.75rem', fontWeight: 600, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{p.name}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{p.email}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{p.phone}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
-                  <div style={{ display: 'flex', gap: '0.6rem' }}>
-                    <button className="btn-action-edit" onClick={() => { setActiveTab('add-party'); setPartyForm(p); }}>
-                      <Edit size={14} /> Edit
-                    </button>
-                    <button className="btn-action-delete" onClick={() => handleDeleteParty(p.id)}>
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
-                </td>
+        </div>
+
+        <div className="stock-table-container" style={{ overflowX: 'auto' }}>
+          <table className="stock-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
+                {['Party Name', 'Email', 'Mobile', 'Actions'].map(h => (
+                  <th key={h} style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Showing {Math.min((partyPage - 1) * partyRowsPerPage + 1, totalParties)} to {Math.min(partyPage * partyRowsPerPage, totalParties)} of {totalParties} entries
+            </thead>
+            <tbody>
+              {pagedParties.map(p => (
+                <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
+                  <td style={{ padding: '0.45rem 0.75rem', fontWeight: 600, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{p.name}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{p.email}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{p.phone}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <button className="btn-action-edit" onClick={() => { setActiveTab('add-party'); setPartyForm(p); }}>
+                        <Edit size={14} /> Edit
+                      </button>
+                      <button className="btn-action-delete" onClick={() => handleDeleteParty(p.id)}>
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Rows per page:
-            <select
-              value={partyRowsPerPage}
-              onChange={e => { setPartyRowsPerPage(Number(e.target.value)); setPartyPage(1); }}
-              style={{ padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-            </select>
+        <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Showing {Math.min((partyPage - 1) * partyRowsPerPage + 1, totalParties)} to {Math.min(partyPage * partyRowsPerPage, totalParties)} of {totalParties} entries
           </div>
-          <div style={{ display: 'flex', gap: '0.25rem' }}>
-            <button
-              onClick={() => setPartyPage(p => Math.max(p - 1, 1))}
-              disabled={partyPage === 1}
-              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: partyPage === 1 ? '#ccc' : 'var(--text-muted)', cursor: partyPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            ><ChevronLeft size={16} /></button>
-            <button
-              onClick={() => setPartyPage(p => Math.min(p + 1, partyTotalPages))}
-              disabled={partyPage === partyTotalPages}
-              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: partyPage === partyTotalPages ? '#ccc' : 'var(--text-muted)', cursor: partyPage === partyTotalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            ><ChevronRight size={16} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Rows per page:
+              <select
+                value={partyRowsPerPage}
+                onChange={e => { setPartyRowsPerPage(Number(e.target.value)); setPartyPage(1); }}
+                style={{ padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={15}>15</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: '0.25rem' }}>
+              <button
+                onClick={() => setPartyPage(p => Math.max(p - 1, 1))}
+                disabled={partyPage === 1}
+                style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: partyPage === 1 ? '#ccc' : 'var(--text-muted)', cursor: partyPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              ><ChevronLeft size={16} /></button>
+
+              {[...Array(partyTotalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPartyPage(i + 1)}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: 'var(--radius-sm)',
+                    border: partyPage === i + 1 ? 'none' : '1px solid var(--border-color)',
+                    background: partyPage === i + 1 ? 'var(--primary)' : '#fff',
+                    color: partyPage === i + 1 ? '#fff' : 'var(--text-muted)',
+                    fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'
+                  }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setPartyPage(p => Math.min(p + 1, partyTotalPages))}
+                disabled={partyPage === partyTotalPages}
+                style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: partyPage === partyTotalPages ? '#ccc' : 'var(--text-muted)', cursor: partyPage === partyTotalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              ><ChevronRight size={16} /></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
   };
 
   const renderAddMeal = () => (
@@ -292,13 +302,16 @@ const PartyMealManagement = () => {
         </div>
       </div>
       <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-        <button type="button" onClick={() => setMealForm({ name: '' })} style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
+        <button type="button" onClick={() => setActiveTab('manage-meals')} style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>Cancel</button>
+        <button type="button" onClick={() => setMealForm({ name: '' })} style={{ padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <RefreshCcw size={16} /> Reset
+        </button>
         <button type="submit" style={{
-          padding: '0.6rem 1.5rem', borderRadius: 'var(--radius-md)', border: 'none',
+          padding: '0.6rem 2rem', borderRadius: 'var(--radius-md)', border: 'none',
           background: 'var(--primary)', color: '#fff', fontWeight: 700, cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem'
         }}>
-          <Save size={18} /> Save Meal
+          <Plus size={18} /> {mealForm.id ? 'Update Meal' : 'Add Meal'}
         </button>
       </div>
     </form>
@@ -309,81 +322,98 @@ const PartyMealManagement = () => {
     const mealTotalPages = Math.max(1, Math.ceil(totalMeals / mealRowsPerPage));
     const pagedMeals = meals.slice((mealPage - 1) * mealRowsPerPage, mealPage * mealRowsPerPage);
     return (
-    <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border-color)',
-      borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
-    }}>
-      <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Coffee size={18} style={{ color: 'var(--primary)' }} />
-          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Meals</span>
+      <div style={{
+        background: 'var(--surface)', border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden'
+      }}>
+        <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(79, 70, 229, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Coffee size={18} style={{ color: 'var(--primary)' }} />
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', letterSpacing: '0.02em' }}>Meals</span>
+          </div>
+          <button onClick={exportMealsToPDF} style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <FileText size={14} /> Export PDF
+          </button>
         </div>
-        <button onClick={exportMealsToPDF} style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-          <FileText size={14} /> Export PDF
-        </button>
-      </div>
 
-      <div className="stock-table-container" style={{ overflowX: 'auto' }}>
-        <table className="stock-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
-          <thead>
-            <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
-              <th style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>Meal Name</th>
-              <th style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedMeals.map(m => (
-              <tr key={m.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
-                <td style={{ padding: '0.45rem 0.75rem', fontWeight: 600, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{m.name}</td>
-                <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
-                  <div style={{ display: 'flex', gap: '0.6rem' }}>
-                    <button className="btn-action-edit" onClick={() => { setActiveTab('add-meal'); setMealForm(m); }}>
-                      <Edit size={14} /> Edit
-                    </button>
-                    <button className="btn-action-delete" onClick={() => handleDeleteMeal(m.id)}>
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
-                </td>
+        <div className="stock-table-container" style={{ overflowX: 'auto' }}>
+          <table className="stock-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--border-color)' }}>
+                <th style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>Meal Name</th>
+                <th style={{ padding: '0.4rem 0.75rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Showing {Math.min((mealPage - 1) * mealRowsPerPage + 1, totalMeals)} to {Math.min(mealPage * mealRowsPerPage, totalMeals)} of {totalMeals} entries
+            </thead>
+            <tbody>
+              {pagedMeals.map(m => (
+                <tr key={m.id} style={{ borderBottom: '1px solid var(--border-color)', background: '#fff' }}>
+                  <td style={{ padding: '0.45rem 0.75rem', fontWeight: 600, whiteSpace: 'nowrap', borderRight: '1px solid rgba(0,0,0,0.05)' }}>{m.name}</td>
+                  <td style={{ padding: '0.45rem 0.75rem', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <button className="btn-action-edit" onClick={() => { setActiveTab('add-meal'); setMealForm(m); }}>
+                        <Edit size={14} /> Edit
+                      </button>
+                      <button className="btn-action-delete" onClick={() => handleDeleteMeal(m.id)}>
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Rows per page:
-            <select
-              value={mealRowsPerPage}
-              onChange={e => { setMealRowsPerPage(Number(e.target.value)); setMealPage(1); }}
-              style={{ padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-            </select>
+        <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Showing {Math.min((mealPage - 1) * mealRowsPerPage + 1, totalMeals)} to {Math.min(mealPage * mealRowsPerPage, totalMeals)} of {totalMeals} entries
           </div>
-          <div style={{ display: 'flex', gap: '0.25rem' }}>
-            <button
-              onClick={() => setMealPage(p => Math.max(p - 1, 1))}
-              disabled={mealPage === 1}
-              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: mealPage === 1 ? '#ccc' : 'var(--text-muted)', cursor: mealPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            ><ChevronLeft size={16} /></button>
-            <button
-              onClick={() => setMealPage(p => Math.min(p + 1, mealTotalPages))}
-              disabled={mealPage === mealTotalPages}
-              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: mealPage === mealTotalPages ? '#ccc' : 'var(--text-muted)', cursor: mealPage === mealTotalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            ><ChevronRight size={16} /></button>
-          </div>
-        </div>
-      </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Rows per page:
+              <select
+                value={mealRowsPerPage}
+                onChange={e => { setMealRowsPerPage(Number(e.target.value)); setMealPage(1); }}
+                style={{ padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={15}>15</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: '0.25rem' }}>
+              <button
+                onClick={() => setMealPage(p => Math.max(p - 1, 1))}
+                disabled={mealPage === 1}
+                style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: mealPage === 1 ? '#ccc' : 'var(--text-muted)', cursor: mealPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              ><ChevronLeft size={16} /></button>
 
-    </div>
-  );
+              {[...Array(mealTotalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setMealPage(i + 1)}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: 'var(--radius-sm)',
+                    border: mealPage === i + 1 ? 'none' : '1px solid var(--border-color)',
+                    background: mealPage === i + 1 ? 'var(--primary)' : '#fff',
+                    color: mealPage === i + 1 ? '#fff' : 'var(--text-muted)',
+                    fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'
+                  }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setMealPage(p => Math.min(p + 1, mealTotalPages))}
+                disabled={mealPage === mealTotalPages}
+                style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: mealPage === mealTotalPages ? '#ccc' : 'var(--text-muted)', cursor: mealPage === mealTotalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              ><ChevronRight size={16} /></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    );
   };
 
   const renderCompanyDetails = () => (
@@ -396,43 +426,43 @@ const PartyMealManagement = () => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'flex-end' }}>
           <div style={{ flex: '1 1 300px', maxWidth: '400px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Company Name *</label>
-            <input 
-              type="text" 
-              value={companyInfo.name} 
-              onChange={(e) => setCompanyInfo({...companyInfo, name: e.target.value})}
-              required 
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            <input
+              type="text"
+              value={companyInfo.name}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
+              required
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }}
             />
           </div>
           <div style={{ flex: '1 1 250px', maxWidth: '350px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Email *</label>
-            <input 
-              type="email" 
-              value={companyInfo.email} 
-              onChange={(e) => setCompanyInfo({...companyInfo, email: e.target.value})}
-              required 
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            <input
+              type="email"
+              value={companyInfo.email}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, email: e.target.value })}
+              required
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }}
             />
           </div>
           <div style={{ width: '180px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Mobile No. *</label>
-            <input 
-              type="text" 
-              value={companyInfo.phone} 
-              onChange={(e) => setCompanyInfo({...companyInfo, phone: e.target.value})}
-              required 
-              maxLength={10} 
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            <input
+              type="text"
+              value={companyInfo.phone}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, phone: e.target.value })}
+              required
+              maxLength={10}
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }}
             />
           </div>
           <div style={{ width: '220px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>GST No. *</label>
-            <input 
-              type="text" 
-              value={companyInfo.gst} 
-              onChange={(e) => setCompanyInfo({...companyInfo, gst: e.target.value})}
-              required 
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }} 
+            <input
+              type="text"
+              value={companyInfo.gst}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, gst: e.target.value })}
+              required
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem' }}
             />
           </div>
         </div>
@@ -441,12 +471,12 @@ const PartyMealManagement = () => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'flex-start' }}>
           <div style={{ flex: '1 1 500px' }}>
             <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.8rem' }}>Address *</label>
-            <textarea 
-              value={companyInfo.address} 
-              onChange={(e) => setCompanyInfo({...companyInfo, address: e.target.value})}
-              required 
-              rows={3} 
-              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem', resize: 'none' }} 
+            <textarea
+              value={companyInfo.address}
+              onChange={(e) => setCompanyInfo({ ...companyInfo, address: e.target.value })}
+              required
+              rows={3}
+              style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-color)', fontSize: '0.9rem', resize: 'none' }}
             />
           </div>
           <div style={{ width: '350px' }}>
@@ -454,11 +484,11 @@ const PartyMealManagement = () => {
             <div onClick={() => fileInputRef.current.click()} style={{ border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-md)', padding: '0.75rem', textAlign: 'center', cursor: 'pointer', background: 'var(--bg-color)' }}>
               <Camera size={20} style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }} />
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{companyInfo.logo ? companyInfo.logo.name : 'Click to choose logo'}</div>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={(e) => setCompanyInfo({...companyInfo, logo: e.target.files[0]})}
-                style={{ display: 'none' }} 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={(e) => setCompanyInfo({ ...companyInfo, logo: e.target.files[0] })}
+                style={{ display: 'none' }}
               />
             </div>
             <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -484,7 +514,6 @@ const PartyMealManagement = () => {
     { id: 'manage-parties', label: 'Manage Parties', icon: Users },
     { id: 'add-meal', label: 'Add Meal', icon: Plus },
     { id: 'manage-meals', label: 'Manage Meals', icon: Coffee },
-    { id: 'company-details', label: 'Company Info', icon: Building2 },
   ];
 
   return (
@@ -526,7 +555,6 @@ const PartyMealManagement = () => {
       {activeTab === 'manage-parties' && renderManageParties()}
       {activeTab === 'add-meal' && renderAddMeal()}
       {activeTab === 'manage-meals' && renderManageMeals()}
-      {activeTab === 'company-details' && renderCompanyDetails()}
 
       <style>{`
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }

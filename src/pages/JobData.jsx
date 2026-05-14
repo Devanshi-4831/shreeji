@@ -9,11 +9,17 @@ import {
 const JobData = () => {
   const [activeTab, setActiveTab] = useState('manage'); // 'add', 'manage', 'report'
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const mockJobs = [
     { id: 'JOB-482', party: 'Acme Corp', meal: 'A', gsm: 80, size: '60*90', req: 5000, used: 5000, remaining: 0, nxr: 'NXR-001', status: 'Completed', date: '2026-05-10' },
     { id: 'JOB-483', party: 'Global Tech', meal: 'B', gsm: 100, size: '70*100', req: 12000, used: 8000, remaining: 4000, nxr: 'No NXR', status: 'In Progress', date: '2026-05-15' },
   ];
+
+  const totalPages = Math.ceil(mockJobs.length / rowsPerPage);
+  const pagedJobs = mockJobs.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
 
   const renderAddJob = () => (
     <div style={{
@@ -168,19 +174,54 @@ const JobData = () => {
 
       {/* Pagination Footer */}
       <div style={{ padding: '0.75rem 1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(79, 70, 229, 0.02)' }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Page 1 of 1</div>
+        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, mockJobs.length)} to {Math.min(currentPage * rowsPerPage, mockJobs.length)} of {mockJobs.length} entries
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             Rows per page:
-            <select style={{ padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}>
-              <option>5</option>
-              <option>10</option>
-              <option>15</option>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+              style={{ padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
             </select>
           </div>
           <div style={{ display: 'flex', gap: '0.25rem' }}>
-            <button style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={16} /></button>
-            <button style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={16} /></button>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: currentPage === 1 ? '#ccc' : 'var(--text-muted)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                style={{
+                  width: '32px', height: '32px', borderRadius: 'var(--radius-sm)',
+                  border: currentPage === i + 1 ? 'none' : '1px solid var(--border-color)',
+                  background: currentPage === i + 1 ? 'var(--primary)' : '#fff',
+                  color: currentPage === i + 1 ? '#fff' : 'var(--text-muted)',
+                  fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'
+                }}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages || mockJobs.length === 0}
+              style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: '#fff', color: (currentPage === totalPages || mockJobs.length === 0) ? '#ccc' : 'var(--text-muted)', cursor: (currentPage === totalPages || mockJobs.length === 0) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
       </div>
